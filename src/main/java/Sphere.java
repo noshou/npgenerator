@@ -50,7 +50,7 @@ import com.google.common.primitives.UnsignedInteger;
  *
  * @author [Your Name]
  */
-public class SpherePacked {
+public class Sphere {
 
     /**
      * Radius of the nanoparticle in nanometers (nm).
@@ -96,7 +96,7 @@ public class SpherePacked {
      *                   This value is internally converted to nanometers.
      * @param precision  Number of significant digits for Apfloat calculations.
      */
-    public SpherePacked(String r_npt, String r_atm, UnsignedInteger precision) {
+    public Sphere(String r_npt, String r_atm, UnsignedInteger precision) {
 
         // store precision as int
         this.precision = precision.intValue();
@@ -334,7 +334,7 @@ public class SpherePacked {
         UnsignedInteger precision = UnsignedInteger.valueOf(_prec);
 
         // Perform calculation and output results
-        SpherePacked result = new SpherePacked(r_npt, r_atm, precision);
+        Sphere result = new Sphere(r_npt, r_atm, precision);
         System.out.println(result);
     }
 }
