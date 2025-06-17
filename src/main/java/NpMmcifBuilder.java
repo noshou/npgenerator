@@ -43,13 +43,12 @@ class NpMmcifBuilder {
         writer.write("_atom_site.Cartn_x\n");
         writer.write("_atom_site.Cartn_y\n");
         writer.write("_atom_site.Cartn_z\n");
-        writer.write("_atom_site.B_iso_or_equiv\n");
         writer.write("_atom_site.pdbx_formal_charge\n");
         writer.write("_atom_site.occupancy\n");
         writer.write("_atom_site.auth_asym_id\n");
         writer.write("_atom_site.radius_Å\n");
-        writer.write("_atom_site.bounding_box\n");
-        writer.write("_atom_site.temperature_K");
+        writer.write("_atom_site.bounding_box_vertices\n");
+        writer.write("_atom_site.bounding_box_face_centroids");
     }
 
     public void addAtom(Atom atom) throws IOException {
@@ -63,7 +62,7 @@ class NpMmcifBuilder {
 
         // Format coordinates with proper decimal handling
         String line = new String(String.format(
-                "HETATM %d %s %lf %lf %lf %s 1 A %s %s %s %s",
+                "HETATM %d %s %lf %lf %lf %lf 1 A %s %s %s",
                 atom.fetchIndex(),
                 String.format(
                         "%sd",
@@ -73,11 +72,10 @@ class NpMmcifBuilder {
                 atom.fetchCoordinates().fetch(0),
                 atom.fetchCoordinates().fetch(1),
                 atom.fetchCoordinates().fetch(2),
-                atom.bIso(),
                 atom.fetchFormalCharge(),
                 atom.fetchRadius(),
-                atom.boundingBox().toString(),
-                atom.temp()
+                atom.fetchBboxVertices().toString(),
+                atom.fetchBboxFaceCentroids().toString()
             )
         );
         writer.write(line);

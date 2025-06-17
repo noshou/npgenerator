@@ -1,55 +1,32 @@
 import org.apfloat.*;
 import java.util.*;
 import com.google.common.primitives.UnsignedInteger;
-import org.rcsb.cif.model.binary.BinaryFile;
 
 /**
- * Calculates optimally filled sphere of atoms, assuming an icosahedral geometry.
+ * Models a nanoparticle as an icosahedral sphere and calculates atomic packing.
  * <p>
- * This model treats the nanoparticle as a regular icosahedron composed of
- * closely packed atoms, each modeled as a sphere. The computation is based
- * on the radius of the nanoparticle and the radius of the atom composing the nanoparticle.
- * </p>
- *
- * <h2>Mathematical Formulation</h2>
- * <p>
- * Let:
+ * This implementation treats the nanoparticle as a regular icosahedron composed of
+ * closely packed atomic spheres. Calculations are based on:
  * <ul>
- *   <li>{@code r_npt} = radius of the nanoparticle (nanometers, nm)</li>
- *   <li>{@code r_atm} = radius of a single atom (angstroms, converted to nanometers)</li>
- *   <li>{@code n_atm} = estimated number of atoms in the nanoparticle (unitless count)</li>
- *   <li>{@code l_ico} = edge length of the icosahedron (nanometers)</li>
- *   <li>{@code v_npt} = volume of the icosahedron (cubic nanometers, nm³)</li>
- *   <li>{@code v_atm} = volume of a single atom (cubic nanometers, nm³)</li>
+ *   <li>Nanoparticle radius</li>
+ *   <li>Atomic radius</li>
+ *   <li>Icosahedral geometry relationships</li>
  * </ul>
  *
- * <p>From icosahedral geometry, we derive the following:</p>
- *
- * <pre>{@code
- * r_npt = l_ico * (sqrt(10 + 2 * sqrt(5)) / 4)
- * => l_ico = (4 / sqrt(10 + 2 * sqrt(5))) * r_npt
- *
- * v_npt = ((15 + 5 * sqrt(5)) / 12) * l_ico^3
- * => v_npt = ((15 + 5 * sqrt(5)) / 12) * ((4 / sqrt(10 + 2 * sqrt(5))) * r_npt)^3
- *
- * v_atm = (4 / 3) * π * r_atm^3
- *
+ * <h2>Key Formulas</h2>
+ * <pre>
+ * r_npt = l_ico × (√(10 + 2√5)) / 4
+ * l_ico = (4 × r_npt) / √(10 + 2√5)
+ * v_npt = (15 + 5√5)/12 × l_ico³
+ * v_atm = (4/3)π(r_atm)³
  * n_atm = v_npt / v_atm
- * => n_atm = ((15 + 5 * sqrt(5)) / (16 * π)) * (r_npt / r_atm)^3 * (64 / (10 + 2 * sqrt(5))^(3/2))
- * }</pre>
+ * </pre>
  *
- * <p>
- * This yields a closed-form expression to estimate the atom count based on known physical constants.
- * </p>
- *
- * <p><b>Reference:</b> The model and formulae are adapted from the study:
- * <a href="https://link-springer-com.cyber.usask.ca/article/10.1007/s11051-016-3587-7">
- * Gieseke et al., "SAXS-based structure analysis of ligand-free gold nanoparticles in aqueous solution",
- * Journal of Nanoparticle Research (2016)
- * </a>
- * </p>
- *
- * @author [Your Name]
+ * <h2>References</h2>
+ * Implements the geometric model from:
+ * Gieseke et al., "SAXS-based structure analysis of ligand-free gold nanoparticles
+ * in aqueous solution", Journal of Nanoparticle Research (2016)
+ * DOI: 10.1007/s11051-016-3587-7
  */
 public class Sphere extends Nanoparticle {
 
@@ -71,7 +48,7 @@ public class Sphere extends Nanoparticle {
     /**
      * Returns the radius of the nanoparticle as a string with full configured precision.
      *
-     * @return string representation of the nanoparticle radius (nanometers)
+     * @return string representation of the nanoparticle radius (Å)
      */
     public String nanoParticleRadius() {
         Apfloat fmt_rIco = new Apfloat (
@@ -96,16 +73,14 @@ public class Sphere extends Nanoparticle {
 
 
     /**
-     * Constructs a {@code SpherePacked} instance modeling a nanoparticle and estimates
-     * the number of atoms it contains.
+     * Constructs a sphere-modeled nanoparticle and calculates properties.
      *
-     * @param r_npt         Radius of the nanoparticle in nanometers (nm), passed as string.
-     * @param r_atm         Radius of a single atom in angstroms (Å), passed as string.
-     *                      This value is internally converted to nanometers.
-     * @param precision     Number of significant digits for Apfloat calculations.
-     * @param name          Name of atom (must be mmcif compatible)
-     * @param temp          Temperature of atom (K)
-     * @param print_digits  Number of digits to print
+     * @param r_npt        Nanoparticle radius in nanometers (nm)
+     * @param r_atm        Atomic radius in angstroms (Å)
+     * @param precision    Calculation precision (significant digits)
+     * @param name         Atom name (mmCIF compatible)
+     * @param temp         Equilibrium temperature in Kelvin (K)
+     * @param print_digits Display precision for string outputs
      */
     public Sphere(
             String r_npt,
@@ -174,12 +149,11 @@ public class Sphere extends Nanoparticle {
             )
         };
 
+        super.addParams(ico_params);
+
         // print status
         System.out.println("\nDone preliminary calculations...");
         System.out.println(super.toString());
-
-//        // calculate atoms, process mmCIF file
-//        Atom atom;
     }
 
     /**
