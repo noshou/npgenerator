@@ -1,30 +1,6 @@
 import com.google.common.primitives.UnsignedInteger;
 import org.apfloat.*;
-
-/**
- * Abstract base class representing a nanoparticle composed of atoms.
- * <p>
- * This class provides core functionality for modeling nanoparticles, including:
- * <ul>
- *   <li>Atomic properties (radius, volume)</li>
- *   <li>Nanoparticle volume and atom count</li>
- *   <li>High-precision calculations using Apfloat</li>
- *   <li>Temperature-dependent properties</li>
- * </ul>
- *
- * Subclasses implement specific geometric models to calculate nanoparticle properties.
- * All floating-point calculations use arbitrary precision arithmetic.
- *
- * <h2>Core Parameters</h2>
- * <ul>
- *   <li>{@code r_atm}: Atomic radius (Å) - converted from angstroms during construction</li>
- *   <li>{@code v_atm}: Atomic volume (nm³)</li>
- *   <li>{@code n_atm}: Estimated number of atoms in nanoparticle</li>
- *   <li>{@code v_npt}: Nanoparticle volume (nm³)</li>
- *   <li>{@code temp}: Temperature in Kelvin</li>
- * </ul>
- */
-public abstract class Nanoparticle {
+public class DELETEME {
 
     /**
      * Radius of a single atom in Å.
@@ -65,12 +41,6 @@ public abstract class Nanoparticle {
      * number of digits to display when toString called
      */
     private int print_digits;
-
-
-    /**
-     * equilibrium temperature of nanoparticle
-     */
-    private int temp;
 
     /**
      * sets volume of nanoparticle
@@ -214,30 +184,21 @@ public abstract class Nanoparticle {
     }
 
     /**
-     * @return Equilibrium temperature of nanoparticle
-     */
-    public int fetchTemp() { return this.temp; }
-
-    /**
      * Constructs a Nanoparticle base instance.
      *
      * @param r_atm        Atomic radius in angstroms (Å)
      * @param precision    Number of significant digits for calculations
      * @param name         Atom name (mmCIF compatible)
-     * @param temp         Temperature in Kelvin (K)
      * @param print_digs   Number of digits for string representation
      */
     public Nanoparticle(
             String r_atm,
             UnsignedInteger precision,
             String name,
-            int temp,
             int print_digs
     ) {
         // store name of atoms making up nanoparticle
         this.name = name;
-
-        this.temp = temp;
 
         // store precision as int
         this.precision = precision.intValue();
@@ -261,7 +222,6 @@ public abstract class Nanoparticle {
         np.append(String.format("\nAtom name:             \t%s", this.fetchName()));
         np.append(String.format("\nVolume of Atom:        \t%s nm³", this.atomVolume()));
         np.append(String.format("\nRadius of Atom:        \t%s Å", this.atomRadius()));
-        np.append(String.format("\nTemperature (Kelvin):  \t%d K", this.fetchTemp()));
         np.append(String.format("\nCalculation  Precision:\t%s digits", this.fetchPrecision()));
         np.append(String.format("\nAtoms  in Nanoparticle:\t%s", this.numberOfAtoms()));
         np.append(String.format("\nVolume of Nanoparticle:\t%s nm³", this.volumeOfNanoparticle()));
