@@ -101,5 +101,12 @@ public class Sphere extends Shape {
         index++;
         curr = coordinates.getPosition();
         }
+
+        //TODO when ready, remove !
+        try {
+            this.file.writeFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

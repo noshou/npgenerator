@@ -2,7 +2,6 @@ import com.oson.tuple.*;
 import java.io.*;
 import java.nio.file.*;
 
-//
 class NpMmcifBuilder {
     private static NpMmcifBuilder instance = null;
     private final String file_name;
@@ -10,8 +9,8 @@ class NpMmcifBuilder {
     private boolean is_finished;
     private NpMmcifBuilder(String file_name) throws IOException {
         // create tmp file
-        this.file_name = file_name + ".mmcif";
-        Path temp_path = Paths.get(file_name + ".tmp");
+        this.file_name = file_name + ".cif"; // full final name
+        Path temp_path = Paths.get(this.file_name + ".tmp"); // → test.cif.tmp
         this.writer = Files.newBufferedWriter(temp_path);
     }
         public static NpMmcifBuilder getInstance(String file_name) throws IOException {
@@ -86,7 +85,7 @@ class NpMmcifBuilder {
       */
     public void abort() throws IOException {
         writer.close();
-        Files.deleteIfExists(Paths.get(file_name + ".tmp"));
+        Files.deleteIfExists(Paths.get(this.file_name + ".tmp"));
     }
 
     /**
@@ -98,8 +97,8 @@ class NpMmcifBuilder {
         if (!is_finished) {
             writer.close();
             Files.move(
-                    Paths.get(file_name + ".tmp"),
-                    Paths.get(file_name),
+                    Paths.get(this.file_name + ".tmp"),  // test.cif.tmp
+                    Paths.get(this.file_name),           // test.cif
                     StandardCopyOption.ATOMIC_MOVE
             );
             is_finished = true;
