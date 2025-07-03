@@ -96,11 +96,14 @@ class NpMmcifBuilder {
     public void writeFile() throws IOException {
         if (!is_finished) {
             writer.close();
+
             Files.move(
-                    Paths.get(this.file_name + ".tmp"),  // test.cif.tmp
-                    Paths.get(this.file_name),           // test.cif
-                    StandardCopyOption.ATOMIC_MOVE
+                    Paths.get(this.file_name + ".tmp"),   // from
+                    Paths.get(this.file_name),            // to
+                    StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING   // optional: overwrites existing file
             );
+
             is_finished = true;
         }
     }

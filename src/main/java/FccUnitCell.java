@@ -22,6 +22,8 @@ import org.apfloat.*;
  */
 public class FccUnitCell extends BravaisUnitCell {
 
+    private static final Apfloat HALF = new Apfloat("0.5");
+
     /**
      * Constructs a fully parameterized FCC unit cell with a four-atom basis.
      * Each atom may have distinct identity and properties (element, radius, charge).
@@ -42,7 +44,7 @@ public class FccUnitCell extends BravaisUnitCell {
      * @param atom_d_radius     radius of atom D (Å); must not be null
      */
     public FccUnitCell(
-            @NotNull String lattice_constant,
+            @NotNull Apfloat lattice_constant,
             int precision,
             @NotNull String atom_a_name,
             int atom_a_charge,
@@ -58,9 +60,11 @@ public class FccUnitCell extends BravaisUnitCell {
             @NotNull String atom_d_radius
     ) {
         super(
-                lattice_constant, lattice_constant, lattice_constant,   // a = b = c
-                "90", "90", "90",                                       // α = β = γ = 90°
-                "F m -3 m",                                             // FCC space group
+                lattice_constant, lattice_constant, lattice_constant,    // a = b = c
+                new Apfloat("90"),
+                new Apfloat("90"),
+                new Apfloat("90"),                                  // α = β = γ = 90°
+                "F m -3 m",                                              // FCC space group
                 buildBasis(
                         precision,
                         atom_a_name, atom_a_charge, atom_a_radius,
@@ -92,7 +96,7 @@ public class FccUnitCell extends BravaisUnitCell {
      * @param atom_d_radius  atomic radius of atom D; must not be null
      * @return a {@code Polyad<Atom>} containing the four initialized atoms
      */
-    @Contract("_, _, _, _, _, _, _, _, _, _, _, _, _, _ -> new")
+    @Contract("_, _, _, _, _, _, _, _, _, _, _, _, _ -> new")
     private static @NotNull Polyad<@NotNull Atom> buildBasis(
             int precision,
             @NotNull String atom_a_name,
@@ -109,9 +113,9 @@ public class FccUnitCell extends BravaisUnitCell {
             @NotNull String atom_d_radius
     ) {
         Atom a = new Atom(atom_a_name, atom_a_radius, new Triad<>("0", "0", "0"), atom_a_charge, precision);
-        Atom b = new Atom(atom_b_name, atom_b_radius, new Triad<>("0.5", "0.5", "0"), atom_b_charge, precision);
-        Atom c = new Atom(atom_c_name, atom_c_radius, new Triad<>("0.5", "0", "0.5"), atom_c_charge, precision);
-        Atom d = new Atom(atom_d_name, atom_d_radius, new Triad<>("0", "0.5", "0.5"), atom_d_charge, precision);
+        Atom b = new Atom(atom_b_name, atom_b_radius, new Triad<>(HALF.toString(), HALF.toString(), "0"), atom_b_charge, precision);
+        Atom c = new Atom(atom_c_name, atom_c_radius, new Triad<>(HALF.toString(), "0", HALF.toString()), atom_c_charge, precision);
+        Atom d = new Atom(atom_d_name, atom_d_radius, new Triad<>("0", HALF.toString(), HALF.toString()), atom_d_charge, precision);
         return new Polyad<>(new Atom[]{a, b, c, d});
     }
 
@@ -122,31 +126,38 @@ public class FccUnitCell extends BravaisUnitCell {
      * If no atom exists at the given coordinate, {@code null} is returned.
      * </p>
      *
-     * @param frac_x fractional x-coordinate (may be any real value)
-     * @param frac_y fractional y-coordinate (may be any real value)
-     * @param frac_z fractional z-coordinate (may be any real value)
+     * @param frac_x fractional x-coordinate (Apfloat, ≥ 0, < 1)
+     * @param frac_y fractional y-coordinate (Apfloat, ≥ 0, < 1)
+     * @param frac_z fractional z-coordinate (Apfloat, ≥ 0, < 1)
      * @return the {@link Atom} located at this lattice position, or {@code null} if empty
      */
     @Override
     @Contract(pure = true)
     public @Nullable Atom getLatticePoint(
-            double frac_x,
-            double frac_y,
-            double frac_z
+            @NotNull Apfloat frac_x,
+            @NotNull Apfloat frac_y,
+            @NotNull Apfloat frac_z
     ) {
-        // convert to basis coordinates
-        double x = Math.abs(frac_x) % 1;
-        double y = Math.abs(frac_y) % 1;
-        double z = Math.abs(frac_z) % 1;
+        // Normalize fractional coords modulo 1 (assuming inputs ≥ 0)
+        Apfloat x = frac_x.mod(Apfloat.ONE);
+        Apfloat y = frac_y.mod(Apfloat.ONE);
+        Apfloat z = frac_z.mod(Apfloat.ONE);
 
-        // match against known FCC positions
-        if (x == 0 && y == 0 && z == 0) {
+        if (x.compareTo(Apfloat.ZERO) == 0
+                && y.compareTo(Apfloat.ZERO) == 0
+                && z.compareTo(Apfloat.ZERO) == 0) {
             return super.getAtom(0);
-        } else if (x == 0.5 && y == 0.5 && z == 0) {
+        } else if (x.compareTo(HALF) == 0
+                && y.compareTo(HALF) == 0
+                && z.compareTo(Apfloat.ZERO) == 0) {
             return super.getAtom(1);
-        } else if (x == 0.5 && y == 0 && z == 0.5) {
+        } else if (x.compareTo(HALF) == 0
+                && y.compareTo(Apfloat.ZERO) == 0
+                && z.compareTo(HALF) == 0) {
             return super.getAtom(2);
-        } else if (x == 0 && y == 0.5 && z == 0.5) {
+        } else if (x.compareTo(Apfloat.ZERO) == 0
+                && y.compareTo(HALF) == 0
+                && z.compareTo(HALF) == 0) {
             return super.getAtom(3);
         } else {
             return null;

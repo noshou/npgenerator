@@ -4,10 +4,11 @@ import java.io.IOException;
 
 
 public class Sphere extends Shape {
-
+    // RADIUS IS IN NANOMETERS !!!
     private NpMmcifBuilder file;
     public Sphere(
             String radius,
+            String radius_type,
             LatticeType lattice_type,
             int precision,
             Polyad<Atom> basis,
@@ -18,6 +19,7 @@ public class Sphere extends Shape {
     ) {
         super(
                 radius,
+                radius_type,
                 lattice_type,
                 precision,
                 basis,
@@ -53,17 +55,15 @@ public class Sphere extends Shape {
 
         // write atoms
         int index = 0;
-        Apfloat r = new Apfloat(this.radius, this.precision);
-        Apfloat a = new Apfloat(this.lattice_constant, this.precision);
-        Triad<String> curr = coordinates.getPosition();
+        Triad<Apfloat> curr = coordinates.getPosition();
 
         while (curr != null) {
-            Apfloat x_frac = new Apfloat(curr.fetch(0), this.precision);
-            Apfloat y_frac = new Apfloat(curr.fetch(1), this.precision);
-            Apfloat z_frac = new Apfloat(curr.fetch(2), this.precision);
-            Apfloat x_cart = x_frac.multiply(a);
-            Apfloat y_cart = y_frac.multiply(a);
-            Apfloat z_cart = z_frac.multiply(a);
+            Apfloat x_frac = curr.fetch(0);
+            Apfloat y_frac = curr.fetch(1);
+            Apfloat z_frac = curr.fetch(2);
+            Apfloat x_cart = x_frac.multiply(this.lattice_constant);
+            Apfloat y_cart = y_frac.multiply(this.lattice_constant);
+            Apfloat z_cart = z_frac.multiply(this.lattice_constant);
 
             // noinspection SuspiciousNameCombination
             Apfloat circle = ApfloatMath.pow(x_cart, 2)
@@ -71,11 +71,11 @@ public class Sphere extends Shape {
                     .add(ApfloatMath.pow(z_cart, 2));
 
             // x_cart^2 + y^2 + z^2 ≤ r^2
-            if (circle.compareTo(ApfloatMath.pow(r, 2)) <= 0) {
+            if (circle.compareTo(ApfloatMath.pow(this.radius_angstroms, 2)) <= 0) {
                 Atom curr_atom = unit_cell.getLatticePoint(
-                        x_frac.doubleValue(),
-                        y_frac.doubleValue(),
-                        z_frac.doubleValue()
+                        x_frac,
+                        y_frac,
+                        z_frac
                 );
                 if (curr_atom != null) {
                     curr_atom.latticePoint(
@@ -98,8 +98,12 @@ public class Sphere extends Shape {
                     }
                 }
             }
-        index++;
-        curr = coordinates.getPosition();
+            index++;
+            // uncomment for debugging
+            System.out.println(curr);
+            System.out.println(new Triad<>(x_cart.toString(), y_cart.toString(), z_cart.toString())+"\n");
+            curr = coordinates.getPosition();
+
         }
 
         //TODO when ready, remove !

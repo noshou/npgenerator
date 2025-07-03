@@ -1,8 +1,5 @@
 import com.oson.tuple.*;
 
-import java.io.IOException;
-import java.util.Scanner;
-
 public class TestDriver {
     public static void main(String[] args) {
 
@@ -37,8 +34,12 @@ public class TestDriver {
         );
         Atom[] atoms = new Atom[]{_1,_2,_3,_4};
         Polyad<Atom> basis = new Polyad<>(atoms);
+
+        // measure time it takes to build
+        long start_time = System.nanoTime();
         Shape test = new Sphere(
                 "15",
+                "nanometer",
                 LatticeType.FCC,
                 100,
                 basis,
@@ -48,5 +49,8 @@ public class TestDriver {
                 "test_me_now"
         );
         test.build();
+        long end_time =  System.nanoTime();
+        long measured = (end_time - start_time) / (long) 6e10;
+        System.out.print("Execution time (minutes): " + measured);
     }
 }

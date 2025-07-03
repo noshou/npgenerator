@@ -1,4 +1,5 @@
 import com.oson.tuple.*;
+import org.apfloat.*;
 import org.jetbrains.annotations.*;
 
 /**
@@ -17,10 +18,10 @@ import org.jetbrains.annotations.*;
 public abstract class BravaisUnitCell extends  UnitCell {
 
     /** Unit cell lengths along the a, b, and c axes (in Ångströms). */
-    protected final @NotNull String a, b, c;
+    protected final @NotNull Apfloat a, b, c;
 
     /** Interaxial angles α (between b and c), β (between a and c), γ (between a and b) in degrees. */
-    protected final @NotNull String alpha, beta, gamma;
+    protected final @NotNull Apfloat alpha, beta, gamma;
 
     /**
      * Constructs a general crystallographic unit cell with required geometric and atomic properties.
@@ -37,12 +38,12 @@ public abstract class BravaisUnitCell extends  UnitCell {
      * @param precision    digits of precision
      */
     public BravaisUnitCell(
-            @NotNull String a,
-            @NotNull String b,
-            @NotNull String c,
-            @NotNull String alpha,
-            @NotNull String beta,
-            @NotNull String gamma,
+            @NotNull Apfloat a,
+            @NotNull Apfloat b,
+            @NotNull Apfloat c,
+            @NotNull Apfloat alpha,
+            @NotNull Apfloat beta,
+            @NotNull Apfloat gamma,
             @NotNull String space_group,
             @NotNull Polyad<Atom> basis,
             @NotNull LatticeType lattice_type,
@@ -59,17 +60,17 @@ public abstract class BravaisUnitCell extends  UnitCell {
     /** @return interaxial angle α (degrees, between b and c) */
     @Contract(pure = true)
     private @NotNull Dyad<String> getAlpha() {
-        return new Dyad<>("alpha", this.alpha);
+        return new Dyad<>("alpha", this.alpha.toString());
     }
     /** @return interaxial angle β (degrees, between a and c) */
     @Contract(pure = true)
     private @NotNull Dyad<String> getBeta() {
-        return new Dyad<>("beta", this.beta);
+        return new Dyad<>("beta", this.beta.toString());
     }
     /** @return interaxial angle γ (degrees, between a and b) */
     @Contract(pure = true)
     private @NotNull Dyad<String> getGamma() {
-        return new Dyad<>("gamma", this.gamma);
+        return new Dyad<>("gamma", this.gamma.toString());
     }
 
     /**
@@ -102,7 +103,7 @@ public abstract class BravaisUnitCell extends  UnitCell {
      */
     @Contract(pure = true)
     private @NotNull Dyad<String> getA() {
-        return new Dyad<>("a", this.a);
+        return new Dyad<>("a", this.a.toString());
     }
 
     /**
@@ -112,7 +113,7 @@ public abstract class BravaisUnitCell extends  UnitCell {
      */
     @Contract(pure = true)
     private @NotNull Dyad<String> getB() {
-        return new Dyad<>("b", this.b);
+        return new Dyad<>("b", this.b.toString());
     }
 
     /**
@@ -122,7 +123,7 @@ public abstract class BravaisUnitCell extends  UnitCell {
      */
     @Contract(pure = true)
     private @NotNull Dyad<String> getC() {
-        return new Dyad<>("c", this.c);
+        return new Dyad<>("c", this.c.toString());
     }
 
     /**

@@ -1,65 +1,155 @@
-import java.util.concurrent.ConcurrentLinkedQueue;
 import com.oson.tuple.Triad;
 import org.apfloat.*;
+import org.jetbrains.annotations.*;
 
 /**
- * {@code FccCoordinates} generates a grid of fractional coordinates based on a face-centered cubic (FCC) lattice.
+ * {@code FccCoordinates} lazily generates a grid of fractional coordinates for a nanoparticle
+ * modeled using a face-centered cubic (FCC) lattice.
  * <p>
- * It constructs a cubic region of lattice points (with half-step spacing) centered at the origin,
- * based on a specified lattice constant and nanoparticle radius.
- * Each grid point represents a potential unit cell location, but no atoms are stored or assigned yet.
+ * The coordinate grid spans a cube of lattice points centered at the origin, with 0.5 step size,
+ * and bounded by the specified nanoparticle radius.
+ * </p>
+ * <p>
+ * Coordinates are generated on demand using internal counters, which simulate 3 nested loops over x, y, and z.
+ * This avoids precomputing and storing large numbers of positions in memory.
  * </p>
  *
  * <p>
- * This implementation is thread-safe due to its use of {@link ConcurrentLinkedQueue}.
+ * Thread safety is not enforced, as this iterator is designed for single-threaded, sequential access.
  * </p>
  */
-public class FccCoordinates extends AtomicCoordinates {
+public class FccCoordinates implements AtomicCoordinates {
+
+    /** Whether all positions have been iterated. */
+    private boolean is_finished = false;
+
+    /** Nanoparticle bounding radius (rounded up), in lattice units. */
+    private final @NotNull Apfloat radius;
+
+    /** Constant step of 0.5 units used for FCC grid spacing. */
+    private final @NotNull Apfloat face_const;
+
+    /** Constant multiplier -1.0, used to initialize to negative radius. */
+    private final @NotNull Apfloat negate;
+
+    /** Current x position in iteration. */
+    private @NotNull Apfloat x;
+
+    /** Current y position in iteration. */
+    private @NotNull Apfloat y;
+
+    /** Current z position in iteration. */
+    private @NotNull Apfloat z;
+
     /**
-     * helper function for constructor
-     *
-     * @param lattice_constant      the FCC lattice constant, in the same units as the radius (e.g., Ångstroms)
-     * @param nanoparticle_radius   the target nanoparticle radius, in same units as the lattice constant
-     * @param precision             the number of digits for Apfloat precision
+     * Increments the current x position by 0.5.
      */
-    private static ConcurrentLinkedQueue<Triad<String>> build(
-            String lattice_constant,
-            String nanoparticle_radius,
-            int precision
-    ) {
-        ConcurrentLinkedQueue<Triad<String>> grid_positions = new ConcurrentLinkedQueue<>();
-
-        // Set up arbitrary-precision floating point constants
-        Apfloat LC = new Apfloat(lattice_constant, precision);
-        Apfloat NR = new Apfloat(nanoparticle_radius, precision);
-        Apfloat TWO = new Apfloat("2", precision);
-
-        // Compute the discrete search radius: how far we go from the center in each direction
-        int DR = ApfloatMath.ceil(NR.divide(LC)).multiply(TWO).intValue();
-
-        // Loop through the full range in 3D half-step increments (0.5 unit)
-        for (int i = -DR; i <= DR; i++) {
-            for (int j = -DR; j <= DR; j++) {
-                for (int k = -DR; k <= DR; k++) {
-                    Apfloat x = new Apfloat(i, precision).divide(TWO);
-                    Apfloat y = new Apfloat(j, precision).divide(TWO);
-                    Apfloat z = new Apfloat(k, precision).divide(TWO);
-                    grid_positions.add(new Triad<>(x.toString(), y.toString(), z.toString()));
-                }
-            }
-        }
-
-        return grid_positions;
+    @Contract(mutates = "this")
+    private void incrX() {
+        this.x = this.x.add(face_const);
     }
 
     /**
-     * Constructs an FCC grid of 3D positions based on a lattice constant and particle radius.
-     *
-     * @param lattice_constant      the FCC lattice constant, in the same units as the radius (e.g., Ångstroms)
-     * @param nanoparticle_radius   the target nanoparticle radius, in same units as the lattice constant
-     * @param precision             the number of digits for Apfloat precision
+     * Increments the current y position by 0.5.
      */
-    public FccCoordinates(String lattice_constant, String nanoparticle_radius, int precision) {
-        super(build(lattice_constant, nanoparticle_radius, precision));
+    @Contract(mutates = "this")
+    private void incrY() {
+        this.y = this.y.add(face_const);
+    }
+
+    /**
+     * Increments the current z position by 0.5.
+     */
+    @Contract(mutates = "this")
+    private void incrZ() {
+        this.z = this.z.add(face_const);
+    }
+
+    /**
+     * Resets x to -radius after completing one full x-sweep.
+     */
+    @Contract(mutates = "this")
+    private void resetX() {
+        this.x = this.radius.multiply(negate);
+    }
+
+    /**
+     * Resets y to -radius after completing one full y-sweep.
+     */
+    @Contract(mutates = "this")
+    private void resetY() {
+        this.y = this.radius.multiply(negate);
+    }
+
+    /**
+     * Constructs a lazily-evaluated FCC grid of positions based on nanoparticle radius.
+     *
+     * @param radius    the target nanoparticle radius (in same units as lattice constant), must not be null
+     */
+    @Contract(pure = false)
+    public FccCoordinates(
+            @NotNull Apfloat radius
+    ) {
+        this.radius = radius.ceil();
+        this.negate = new Apfloat("-1", this.radius.precision());
+        this.face_const = new Apfloat("0.5", this.radius.precision());
+        this.x = this.radius.multiply(negate);
+        this.y = this.radius.multiply(negate);
+        this.z = this.radius.multiply(negate);
+    }
+
+    /**
+     * Returns the next 3D fractional coordinate in the FCC grid.
+     * <p>
+     * The iteration spans a cube from {@code -radius} to {@code +radius}, using a step of 0.5,
+     * and proceeds in nested order: x sweeps fastest, then y, then z.
+     * </p>
+     * <p>
+     * The returned coordinate is a {@link Triad} of string representations suitable for Apfloat-based usage.
+     * Once all coordinates have been emitted, returns {@code null}.
+     * </p>
+     *
+     * @return the next FCC grid coordinate as a {@code Triad<String>}, or {@code null} if finished
+     */
+    @Override
+    @Contract(pure = false)
+    public @Nullable Triad<@NotNull Apfloat> getPosition() {
+        if (this.is_finished) {
+            return null;
+        }
+
+        // Check if we're at the final point
+        if (
+                x.compareTo(this.radius) == 0
+                && y.compareTo(this.radius) == 0
+                && z.compareTo(this.radius) == 0
+        ) {
+            this.is_finished = true;
+        }
+
+
+        // Generate current position before advancing
+        Triad<@NotNull Apfloat> output = new Triad<>(
+                this.x,
+                this.y,
+                this.z
+        );
+
+        // Advance to the next position
+        incrX();
+        if (this.x.compareTo(this.radius) > 0) {
+            resetX();
+            incrY();
+            if (this.y.compareTo(this.radius) > 0) {
+                resetY();
+                incrZ();
+                if (this.z.compareTo(this.radius) > 0) {
+                    this.is_finished = true;
+                    return null;
+                }
+            }
+
+        }
+        return output;
     }
 }

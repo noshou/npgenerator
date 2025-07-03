@@ -1,4 +1,5 @@
 import com.oson.tuple.*;
+import org.apfloat.Apfloat;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,6 +76,6 @@ public abstract class UnitCell {
      * @return the corresponding basis {@code Atom} with position and properties, or {@code null} if no atom exists at this site
      */
     @Contract(pure = true)
-    public abstract @Nullable Atom getLatticePoint(double frac_x, double frac_y, double frac_z);
+    public abstract @Nullable Atom getLatticePoint(Apfloat frac_x, Apfloat frac_y, Apfloat frac_z);
 
 }
