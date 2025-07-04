@@ -163,4 +163,10 @@ public class FccUnitCell extends BravaisUnitCell {
             return null;
         }
     }
+
+//    // unit test for debug purposes
+//    // based on gold nanoparticles
+//    public static void main(String[] args) {
+//        Apfloat lattice_constant = new Apfloat("")
+//    }
 }

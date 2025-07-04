@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="TestDriverSphere" type="Application" factoryName="Application" nameIsGenerated="true">
+  <configuration default="false" name="TestSphere" type="Application" factoryName="Application" nameIsGenerated="true">
     <output_file path="test.txt" is_save="true" />
-    <option name="MAIN_CLASS_NAME" value="TestDriverSphere" />
+    <option name="MAIN_CLASS_NAME" value="TestSphere" />
     <module name="SaxsCalibration" />
     <option name="VM_PARAMETERS" value="-Xmx8192m" />
     <method v="2">

@@ -255,7 +255,7 @@ public abstract class Shape {
         // RADIUS IS IN NANOMETERS !!!
         NpMmcifBuilder file;
         try {
-            file = NpMmcifBuilder.getInstance(this.file_name);
+            file = new NpMmcifBuilder(this.file_name);
             file.initShape(this.getThis());
         }
         catch (IOException e) {
@@ -344,7 +344,7 @@ public abstract class Shape {
         CoordsDebugWriter dlog = null;
         if (debug) {
             try {
-                dlog = CoordsDebugWriter.getInstance("build_debug");
+                dlog = new CoordsDebugWriter("build_debug_"+this.file_name);
                 dlog.initLog();
             }
             catch (IOException e) {
@@ -356,7 +356,7 @@ public abstract class Shape {
         // RADIUS IS IN NANOMETERS !!!
         NpMmcifBuilder file;
         try {
-            file = NpMmcifBuilder.getInstance(this.file_name);
+            file = new NpMmcifBuilder(this.file_name);
             file.initShape(this.getThis());
         }
         catch (IOException e) {

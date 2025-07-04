@@ -3,21 +3,14 @@ import java.io.*;
 import java.nio.file.*;
 
 class NpMmcifBuilder {
-    private static NpMmcifBuilder instance = null;
     private final String file_name;
     private final BufferedWriter writer;
-    private boolean is_finished;
-    private NpMmcifBuilder(String file_name) throws IOException {
+    private boolean is_finished = false;
+    public NpMmcifBuilder(String file_name) throws IOException {
         // create tmp file
         this.file_name = file_name + ".cif"; // full final name
         Path temp_path = Paths.get(this.file_name + ".tmp"); // → test.cif.tmp
         this.writer = Files.newBufferedWriter(temp_path);
-    }
-        public static NpMmcifBuilder getInstance(String file_name) throws IOException {
-        if (instance == null) {
-            instance = new NpMmcifBuilder(file_name);
-        }
-        return instance;
     }
     public void initShape(Shape s) throws IOException {
         writer.write("data_" + s.getStructureIndex() + "\n");

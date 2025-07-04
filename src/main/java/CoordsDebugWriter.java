@@ -3,21 +3,14 @@ import java.io.*;
 import java.nio.file.*;
 
 class CoordsDebugWriter {
-    private static CoordsDebugWriter instance = null;
     private final String file_name;
     private final BufferedWriter writer;
-    private boolean is_finished;
-    private CoordsDebugWriter(String file_name) throws IOException {
+    private boolean is_finished = false;
+    public CoordsDebugWriter(String file_name) throws IOException {
         // create tmp file
         this.file_name = file_name + ".csv"; // full final name
         Path temp_path = Paths.get(this.file_name + ".tmp"); // → test.cif.tmp
         this.writer = Files.newBufferedWriter(temp_path);
-    }
-        public static CoordsDebugWriter getInstance(String file_name) throws IOException {
-        if (instance == null) {
-            instance = new CoordsDebugWriter(file_name);
-        }
-        return instance;
     }
 
     public void initLog() throws IOException {
