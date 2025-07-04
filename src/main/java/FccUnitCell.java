@@ -1,4 +1,5 @@
 import com.oson.tuple.*;
+import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.*;
 import org.apfloat.*;
 
@@ -138,28 +139,65 @@ public class FccUnitCell extends BravaisUnitCell {
             @NotNull Apfloat frac_y,
             @NotNull Apfloat frac_z
     ) {
-        // Normalize fractional coords modulo 1 (assuming inputs ≥ 0)
-        Apfloat x = frac_x.mod(Apfloat.ONE);
-        Apfloat y = frac_y.mod(Apfloat.ONE);
-        Apfloat z = frac_z.mod(Apfloat.ONE);
+        // get precision, throw error if precisions not the same
+        long x_precision = frac_x.precision();
+        long y_precision = frac_y.precision();
+        long z_precision = frac_z.precision();
+        if (
+                    x_precision != y_precision
+                ||  x_precision != z_precision
+        ) {
+            throw new IllegalArgumentException(
+                        "Fractional positions must have same precision: \n"
+                    +   "x_precision: \t" + x_precision
+                    +   "y_precision: \t" + y_precision
+                    +   "z_precision: \t" + z_precision
+            );
+        }
 
-        if (x.compareTo(Apfloat.ZERO) == 0
-                && y.compareTo(Apfloat.ZERO) == 0
-                && z.compareTo(Apfloat.ZERO) == 0) {
+        // set constants
+        Apfloat ONE = new Apfloat("1", x_precision);
+        Apfloat ZERO = new Apfloat("0", x_precision);
+        Apfloat HALF = new Apfloat("0.5", x_precision);
+        // Normalize fractional coords modulo 1 (assuming inputs ≥ 0)
+        Apfloat x = ApfloatMath.abs(frac_x).mod(ONE);
+        // noinspection SuspiciousNameCombination
+        Apfloat y = ApfloatMath.abs(frac_y).mod(ONE);
+        Apfloat z = ApfloatMath.abs(frac_z).mod(ONE);
+
+        // (int, int, int) -> (0, 0, 0)
+        if (        x.compareTo(ZERO) == 0
+                &&  y.compareTo(ZERO) == 0
+                &&  z.compareTo(ZERO) == 0) {
             return super.getAtom(0);
-        } else if (x.compareTo(HALF) == 0
-                && y.compareTo(HALF) == 0
-                && z.compareTo(Apfloat.ZERO) == 0) {
+        }
+
+        // (non-int, non-int, int) -> (0.5, 0.5, 1)
+        else if (
+                    x.compareTo(HALF) == 0
+                &&  y.compareTo(HALF) == 0
+                &&  z.compareTo(ZERO) == 0) {
             return super.getAtom(1);
-        } else if (x.compareTo(HALF) == 0
-                && y.compareTo(Apfloat.ZERO) == 0
-                && z.compareTo(HALF) == 0) {
+        }
+
+        // (non-int, int, non-int) -> (0.5, 0, 0.5)
+        else if (
+                    x.compareTo(HALF) == 0
+                &&  y.compareTo(ZERO) == 0
+                &&  z.compareTo(HALF) == 0) {
             return super.getAtom(2);
-        } else if (x.compareTo(Apfloat.ZERO) == 0
-                && y.compareTo(HALF) == 0
-                && z.compareTo(HALF) == 0) {
+        }
+
+        // (int, non-int, non-int) -> (0, 0.5, 0.5)
+        else if (
+                    x.compareTo(ZERO) == 0
+                &&  y.compareTo(HALF) == 0
+                &&  z.compareTo(HALF) == 0) {
             return super.getAtom(3);
-        } else {
+        }
+
+        // non-fcc point
+        else {
             return null;
         }
     }

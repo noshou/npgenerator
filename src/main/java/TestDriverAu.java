@@ -1,5 +1,5 @@
 import com.oson.tuple.*;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.*;
 
 /**
  * {@code TestDriverAu} is a standalone test driver for benchmarking gold (Au)
@@ -57,7 +57,7 @@ public class TestDriverAu {
      *
      * @param args should contain radius of nanoparticle in nanometers
      */
-    public static void main(String[] args) {
+    public static void main(String @NotNull [] args) {
 
         // Create FCC basis set of gold atoms
         Polyad<Atom> basis = getBasis();
