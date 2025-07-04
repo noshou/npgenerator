@@ -1,8 +1,7 @@
-import com.oson.tuple.Polyad;
-import org.apfloat.Apfloat;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.oson.tuple.*;
+import org.apfloat.*;
+import org.jetbrains.annotations.*;
+import java.io.IOException;
 
 /**
  * Abstract base class representing a geometric nanostructure based on a lattice arrangement of atoms.
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  * </p>
  *
  * <p><b>Contract:</b> This class is immutable after construction. All fields are non-null unless otherwise noted.
- * Subclasses must implement {@link #build()} to complete the generation of atomic data.</p>
+ * Subclasses must implement {@link #inBounds()} to complete the generation of atomic data.</p>
  */
 public abstract class Shape {
 
@@ -55,6 +54,7 @@ public abstract class Shape {
      * The atomic radius of the constituent atom in angstroms, represented as a string for Apfloat precision. Non-null.
      */
     protected final @NotNull Apfloat radius_angstroms;
+
 
     /**
      * Constructs a new shape instance, resolving units and initializing the lattice.
@@ -163,7 +163,7 @@ public abstract class Shape {
      *
      * @return this shape instance, never null
      */
-    @Contract(pure = true)
+    @Contract("-> this")
     public @NotNull Shape getThis() {
         return this;
     }
@@ -194,8 +194,8 @@ public abstract class Shape {
      * @return the lattice constant as a string, never null
      */
     @Contract(pure = true)
-    public @NotNull String getLatticeConstant() {
-        return this.lattice_constant.toString();
+    public @NotNull Apfloat getLatticeConstant() {
+        return this.lattice_constant;
     }
 
     /**
@@ -214,15 +214,260 @@ public abstract class Shape {
      * @return the radius in angstroms, never null
      */
     @Contract(pure = true)
-    public @NotNull String getRadius() {
-        return this.radius_angstroms.toString();
+    public @NotNull Apfloat getRadius() {
+        return this.radius_angstroms;
     }
 
     /**
-     * Abstract method that constructs or generates the shape using the lattice and coordinate definitions.
+     * Determines whether the Cartesian point (x, y, z) lies within the spatial bounds of the structure.
      * <p>
-     * Implementing classes must define the full build procedure including atom generation and file output.
+     * Implementations should define the exact geometric inclusion criteria (e.g., within a sphere or cube).
      * </p>
+     *
+     * @param x_cart the x-coordinate in Cartesian space, non-null
+     * @param y_cart the y-coordinate in Cartesian space, non-null
+     * @param z_cart the z-coordinate in Cartesian space, non-null
+     * @return true if the point is within the bounds of the shape, false otherwise
      */
-    public abstract void build();
+    @Contract(pure = true)
+    protected abstract boolean inBounds(
+            @NotNull Apfloat x_cart,
+            @NotNull Apfloat y_cart,
+            @NotNull Apfloat z_cart
+    );
+
+    /**
+     * Builds the atomic structure and writes it to a CIF file.
+     * <p>
+     * Coordinates are iterated and filtered through {@link #inBounds(Apfloat, Apfloat, Apfloat)}.
+     * Each valid coordinate is transformed into a lattice atom and recorded in the output file.
+     * </p>
+     *
+     * <p><b>Contract:</b> This method must be called only once per instance. If writing fails at any point,
+     * the temporary output is aborted.</p>
+     *
+     * @throws RuntimeException if an I/O error occurs during file writing or abortion
+     */
+    @Contract("-> fail")  // method may throw at runtime
+    public void build() {
+
+        // get file instance, initialize shape
+        // RADIUS IS IN NANOMETERS !!!
+        NpMmcifBuilder file;
+        try {
+            file = NpMmcifBuilder.getInstance(this.file_name);
+            file.initShape(this.getThis());
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // write atoms
+        int index = 0;
+        Triad<Apfloat> curr = this.coordinates.getPosition();
+
+        // loop through coordinates, check if point is in bounds
+        while (curr != null) {
+            Apfloat x_frac = curr.fetch(0);
+            Apfloat y_frac = curr.fetch(1);
+            Apfloat z_frac = curr.fetch(2);
+            Apfloat x_cart = x_frac.multiply(this.lattice_constant);
+            Apfloat y_cart = y_frac.multiply(this.lattice_constant);
+            Apfloat z_cart = z_frac.multiply(this.lattice_constant);
+
+            // check if point is in the unit lattice
+            if (inBounds(x_cart, y_cart, z_cart)) {
+
+                // if atom is null -> not in unit cell
+                // else, write atom to file
+                Atom curr_atom = this.getUnitCell().getLatticePoint(
+                        x_frac,
+                        y_frac,
+                        z_frac
+                );
+
+                if (curr_atom != null) {
+                    curr_atom.latticePoint(
+                            index,
+                            new Triad<>(
+                                    x_cart.toString(),
+                                    y_cart.toString(),
+                                    z_cart.toString()
+                            )
+                    );
+                    try {
+                        file.addAtom(curr_atom);
+                    } catch (IOException e2) {
+                        try {
+                            file.abort();
+                        } catch (IOException abortException) {
+                            e2.addSuppressed(abortException);
+                        }
+                        throw new RuntimeException(e2);
+                    }
+                }
+            }
+            index++;
+            curr = this.getCoordinates().getPosition();
+        }
+
+        // write files
+        try {
+            file.writeFile();
+        } catch (IOException e2) {
+            try {
+                file.abort();
+            } catch (IOException abortException) {
+                e2.addSuppressed(abortException);
+            }
+            throw new RuntimeException(e2);
+        }
+    }
+
+    /**
+     * Builds the atomic structure and writes it to a CIF file, with optional debug coordinate logging.
+     * <p>
+     * This variant behaves identically to {@link #build()} but also emits a debug trace of included and
+     * excluded atoms to a secondary file if {@code debug} is {@code true}.
+     * </p>
+     *
+     * <p><b>Contract:</b> This method must be called only once per instance. If writing or logging fails,
+     * all temporary files are aborted.</p>
+     *
+     * @param debug whether to emit coordinate debug information to an auxiliary file
+     * @throws RuntimeException if an I/O error occurs during writing, logging, or abortion
+     */
+    @Contract("_ -> fail")  // method may throw at runtime
+    public void build(boolean debug) {
+
+        // initialize debug log (if indicated)
+        CoordsDebugWriter dlog = null;
+        if (debug) {
+            try {
+                dlog = CoordsDebugWriter.getInstance("build_debug");
+                dlog.initLog();
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // get file instance, initialize shape
+        // RADIUS IS IN NANOMETERS !!!
+        NpMmcifBuilder file;
+        try {
+            file = NpMmcifBuilder.getInstance(this.file_name);
+            file.initShape(this.getThis());
+        }
+        catch (IOException e) {
+            if (dlog != null) {
+                try {
+                    dlog.abort();
+                } catch (IOException ex2) {
+                    e.addSuppressed(ex2);  // Optional: add extra context
+                }
+            }
+            throw new RuntimeException(e);
+        }
+
+        // write atoms
+        int index = 0;
+        Triad<Apfloat> curr = this.coordinates.getPosition();
+
+        // loop through coordinates, check if point is in bounds
+        while (curr != null) {
+            Apfloat x_frac = curr.fetch(0);
+            Apfloat y_frac = curr.fetch(1);
+            Apfloat z_frac = curr.fetch(2);
+            Apfloat x_cart = x_frac.multiply(this.lattice_constant);
+            Apfloat y_cart = y_frac.multiply(this.lattice_constant);
+            Apfloat z_cart = z_frac.multiply(this.lattice_constant);
+
+            // check if point is in the unit lattice
+            if (inBounds(x_cart, y_cart, z_cart)) {
+
+                // if atom is null -> not in unit cell
+                // else, write atom to file
+                Atom curr_atom = this.getUnitCell().getLatticePoint(
+                        x_frac,
+                        y_frac,
+                        z_frac
+                );
+
+                if (curr_atom != null) {
+                    curr_atom.latticePoint(
+                            index,
+                            new Triad<>(
+                                    x_cart.toString(),
+                                    y_cart.toString(),
+                                    z_cart.toString()
+                            )
+                    );
+                    try {
+                        file.addAtom(curr_atom);
+                        if (dlog != null) {
+                            dlog.addCoordinate(
+                                    x_frac,
+                                    y_frac,
+                                    z_frac,
+                                    x_cart,
+                                    y_cart,
+                                    z_cart,
+                                    true);
+                        }
+                    } catch (IOException e2) {
+                        try {
+                            file.abort();
+                            if (dlog != null) {
+                                dlog.abort();
+                            }
+                        } catch (IOException abortException) {
+                            e2.addSuppressed(abortException);
+                        }
+                        throw new RuntimeException(e2);
+                    }
+                } else if (dlog != null) {
+                    try {
+                        dlog.addCoordinate(
+                                x_frac,
+                                y_frac,
+                                z_frac,
+                                x_cart,
+                                y_cart,
+                                z_cart,
+                                false);
+                    } catch (IOException e2) {
+                        try {
+                            file.abort();
+                            dlog.abort();
+                        } catch (IOException abortException) {
+                            e2.addSuppressed(abortException);
+                        }
+                        throw new RuntimeException(e2);
+                    }
+                }
+            }
+            index++;
+            curr = this.getCoordinates().getPosition();
+        }
+
+        // write files
+        try {
+            file.writeFile();
+            if (dlog != null) {
+                dlog.writeFile();
+            }
+        } catch (IOException e2) {
+            try {
+                file.abort();
+                if (dlog != null) {
+                    dlog.abort();
+                }
+            } catch (IOException abortException) {
+                e2.addSuppressed(abortException);
+            }
+            throw new RuntimeException(e2);
+        }
+    }
+
 }

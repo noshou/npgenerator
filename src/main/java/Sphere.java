@@ -1,21 +1,38 @@
 import com.oson.tuple.*;
 import org.apfloat.*;
-import java.io.IOException;
+import org.jetbrains.annotations.*;
 
-
+/**
+ * Represents a spherical shape constructed on a specified lattice.
+ * <p>
+ * Extends the abstract {@link Shape} class to implement spherical boundary checks.
+ * * </p>
+ */
 public class Sphere extends Shape {
-    // RADIUS IS IN NANOMETERS !!!
-    private NpMmcifBuilder file;
+
+    /**
+     * Constructs a new {@code Sphere} instance with the given parameters.
+     *
+     * @param radius          the radius of the sphere as a string representation of a number
+     * @param radius_type     the type of radius (e.g., "angstrom", "nm")
+     * @param lattice_type    the lattice type enumeration specifying the crystal lattice structure
+     * @param precision       the precision level for Apfloat calculations
+     * @param basis           the {@link Polyad} of {@link Atom} objects representing the atomic basis of the lattice
+     * @param lattice_constant the lattice constant as a string representation of a number
+     * @param file_name       the output file name associated with this shape
+     * @param structure_name  the name of the structure represented by this shape
+     * @param structure_index the structure index identifier
+     */
     public Sphere(
-            String radius,
-            String radius_type,
-            LatticeType lattice_type,
+            @NotNull String radius,
+            @NotNull String radius_type,
+            @NotNull LatticeType lattice_type,
             int precision,
-            Polyad<Atom> basis,
-            String lattice_constant,
-            String file_name,
-            String structure_name,
-            String structure_index
+            @NotNull Polyad<Atom> basis,
+            @NotNull String lattice_constant,
+            @NotNull String file_name,
+            @NotNull String structure_name,
+            @NotNull String structure_index
     ) {
         super(
                 radius,
@@ -30,87 +47,29 @@ public class Sphere extends Shape {
         );
     }
 
+    /**
+     * Determines whether the given Cartesian coordinates are inside the spherical boundary.
+     *
+     * @param x_cart the x-coordinate in Cartesian space, must not be null
+     * @param y_cart the y-coordinate in Cartesian space, must not be null
+     * @param z_cart the z-coordinate in Cartesian space, must not be null
+     * @return {@code true} if the point is within or on the sphere boundary, {@code false} otherwise
+     */
     @Override
-    public void build() {
+    @Contract(pure = true)
+    protected boolean inBounds(
+            @NotNull Apfloat x_cart,
+            @NotNull Apfloat y_cart,
+            @NotNull Apfloat z_cart
+    ) {
+        // Calculate squared distance from origin: x² + y² + z²
+        // noinspection SuspiciousNameCombination
+        Apfloat distance_squared =
+                ApfloatMath.pow(x_cart, 2)
+                .add(ApfloatMath.pow(y_cart, 2)) // IDEA throwing warning for y_cart hence the noinspection
+                .add(ApfloatMath.pow(z_cart, 2));
 
-        // get file instance
-        try {
-            this.file = NpMmcifBuilder.getInstance(this.file_name);
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        // initialize writing shape
-        try {
-            this.file.initShape(super.getThis());  // pass a Shape instance `s` here, not `Shape s`
-        } catch (IOException e1) {
-            try {
-                this.file.abort();
-            } catch (IOException abortException) {
-                e1.addSuppressed(abortException);
-            }
-            throw new RuntimeException(e1);
-        }
-
-        // write atoms
-        int index = 0;
-        Triad<Apfloat> curr = coordinates.getPosition();
-
-        while (curr != null) {
-            Apfloat x_frac = curr.fetch(0);
-            Apfloat y_frac = curr.fetch(1);
-            Apfloat z_frac = curr.fetch(2);
-            Apfloat x_cart = x_frac.multiply(this.lattice_constant);
-            Apfloat y_cart = y_frac.multiply(this.lattice_constant);
-            Apfloat z_cart = z_frac.multiply(this.lattice_constant);
-
-            // noinspection SuspiciousNameCombination
-            Apfloat circle = ApfloatMath.pow(x_cart, 2)
-                    .add(ApfloatMath.pow(y_cart, 2))
-                    .add(ApfloatMath.pow(z_cart, 2));
-
-            // x_cart^2 + y^2 + z^2 ≤ r^2
-            if (circle.compareTo(ApfloatMath.pow(this.radius_angstroms, 2)) <= 0) {
-                Atom curr_atom = unit_cell.getLatticePoint(
-                        x_frac,
-                        y_frac,
-                        z_frac
-                );
-                if (curr_atom != null) {
-                    curr_atom.latticePoint(
-                            index,
-                            new Triad<>(
-                                    x_cart.toString(),
-                                    y_cart.toString(),
-                                    z_cart.toString()
-                            )
-                    );
-                    try {
-                        this.file.addAtom(curr_atom);
-                    } catch (IOException e2) {
-                        try {
-                            this.file.abort();
-                        } catch (IOException abortException) {
-                            e2.addSuppressed(abortException);
-                        }
-                        throw new RuntimeException(e2);
-                    }
-                }
-            }
-            index++;
-            // uncomment for debugging
-            System.out.println(curr);
-            System.out.println(new Triad<>(x_cart.toString(), y_cart.toString(), z_cart.toString())+"\n");
-            curr = coordinates.getPosition();
-
-        }
-
-        //TODO when ready, remove !
-        try {
-            this.file.writeFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        // if distance_squared <= radius², point within sphere
+        return distance_squared.compareTo(ApfloatMath.pow(super.getRadius(), 2)) <= 0;
     }
 }
