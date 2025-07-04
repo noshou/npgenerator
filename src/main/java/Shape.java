@@ -403,6 +403,7 @@ public abstract class Shape {
                                     z_cart.toString()
                             )
                     );
+                    index++;
                     try {
                         file.addAtom(curr_atom);
                         if (dlog != null) {
@@ -447,7 +448,6 @@ public abstract class Shape {
                     }
                 }
             }
-            index++;
             curr = this.getCoordinates().getPosition();
         }
 
