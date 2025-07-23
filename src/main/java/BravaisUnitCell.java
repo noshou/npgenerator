@@ -20,11 +20,13 @@ public abstract class BravaisUnitCell extends  UnitCell {
     /** Unit cell lengths along the a, b, and c axes (in Ångströms). */
     protected final @NotNull Apfloat a, b, c;
 
-    /** Interaxial angles α (between b and c), β (between a and c), γ (between a and b) in degrees. */
+    /** Interaxial angles α (between b and c), β (between a and c),
+     * γ (between a and b) in degrees. */
     protected final @NotNull Apfloat alpha, beta, gamma;
 
     /**
-     * Constructs a general crystallographic unit cell with required geometric and atomic properties.
+     * Constructs a general crystallographic unit cell with required geometric
+     * and atomic properties.
      *
      * @param a            unit cell edge length a (in Å); must not be null
      * @param b            unit cell edge length b (in Å); must not be null
@@ -74,11 +76,13 @@ public abstract class BravaisUnitCell extends  UnitCell {
     }
 
     /**
-     * Retrieves all interaxial angles (<code>a</code>, <code>β</code>, and <code> γ</code>) as a typed {@link Polyad}
+     * Retrieves all interaxial angles (<code>a</code>, <code>β</code>,
+     * and <code> γ</code>) as a typed {@link Polyad}
      * of {@link Tuple} instances. Each tuple contains a label and its associated value.
      *
      * <p>
-     * This method uses a raw array cast to generic type, but is safe under internal constraints.
+     * This method uses a raw array cast to generic type,
+     * but is safe under internal constraints.
      * </p>
      *
      * @return a non-null {@link Polyad} of {@link Tuple}&lt;String&gt;
@@ -99,7 +103,8 @@ public abstract class BravaisUnitCell extends  UnitCell {
     /**
      * Retrieves the unit cell edge length <code>a</code> in Ångströms.
      *
-     * @return a {@link Dyad} containing the label "a" and the corresponding edge length value
+     * @return a {@link Dyad} containing the label "a"
+     * and the corresponding edge length value
      */
     @Contract(pure = true)
     private @NotNull Dyad<String> getA() {
@@ -109,7 +114,8 @@ public abstract class BravaisUnitCell extends  UnitCell {
     /**
      * Retrieves the unit cell edge length <code>b</code> in Ångströms.
      *
-     * @return a {@link Dyad} containing the label "b" and the corresponding edge length value
+     * @return a {@link Dyad} containing the label "b" and
+     * the corresponding edge length value
      */
     @Contract(pure = true)
     private @NotNull Dyad<String> getB() {
@@ -119,7 +125,8 @@ public abstract class BravaisUnitCell extends  UnitCell {
     /**
      * Retrieves the unit cell edge length <code>c</code> in Ångströms.
      *
-     * @return a {@link Dyad} containing the label "c" and the corresponding edge length value
+     * @return a {@link Dyad} containing the label "c" and
+     * the corresponding edge length value
      */
     @Contract(pure = true)
     private @NotNull Dyad<String> getC() {
@@ -127,14 +134,17 @@ public abstract class BravaisUnitCell extends  UnitCell {
     }
 
     /**
-     * Retrieves all unit cell lengths (<code>a</code>, <code>b</code>, and <code>c</code>) as a typed {@link Polyad}
+     * Retrieves all unit cell lengths (<code>a</code>, <code>b</code>,
+     * and <code>c</code>) as a typed {@link Polyad}
      * of {@link Tuple} instances. Each tuple contains a label and its associated value.
      *
      * <p>
-     * This method uses a raw array cast to generic type, but is safe under internal constraints.
+     * This method uses a raw array cast to generic type, but is safe under
+     * internal constraints.
      * </p>
      *
-     * @return a non-null {@link Polyad} of {@link Tuple}&lt;String&gt; representing the unit cell lengths
+     * @return a non-null {@link Polyad} of {@link Tuple}&lt;String&gt;
+     * representing the unit cell lengths
      */
     @Override
     @SuppressWarnings("unchecked")

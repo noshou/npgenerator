@@ -3,14 +3,18 @@ import org.apfloat.*;
 import org.jetbrains.annotations.*;
 
 /**
- * Represents a single atom with associated identity, fractional position, radius, volume, and charge.
+ * Represents a single atom with associated identity, fractional position,
+ * radius, volume, and charge.
  * <p>
- * The radius and derived values like volume are stored as {@code String} to support arbitrary-precision
- * Apfloat arithmetic. Atom data is intended to be converted into cartesian coordinates and written into
+ * The radius and derived values like volume are stored as {@code String} to
+ * support arbitrary-precision
+ * Apfloat arithmetic. Atom data is intended to be converted into cartesian
+ * coordinates and written into
  * mmCIF files or other crystallographic formats.
  * </p>
  * <p>
- * Additional fields like index and centroid are mutable and assist with serialization or spatial placement.
+ * Additional fields like index and centroid are mutable and assist
+ * with serialization or spatial placement.
  * </p>
  */
 public class Atom implements Comparable<Atom> {
@@ -40,7 +44,7 @@ public class Atom implements Comparable<Atom> {
     private @NotNull Tuple<String> centroid = new Nullad<>();
 
     /**
-     * Constructs an {@code Atom} with element name, radius, charge, and fractional position.
+     * Constructs an {@code Atom} with element name, radius, charge, fractional position.
      *
      * @param element     the atomic symbol (e.g., "Na"); must not be null
      * @param radius      atomic radius in Ångströms as a string (Apfloat-compatible)

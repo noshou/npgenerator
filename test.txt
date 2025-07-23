@@ -1,0 +1,8 @@
+
+Nanoparticle Radius:  	7.5 nm
+Init time:   	150.583 milliseconds
+
+Build time:  	3.484 minutes
+
+Exec time:   	3.486 minutes
+

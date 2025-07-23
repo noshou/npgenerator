@@ -5,9 +5,9 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>SAXSCalibration</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>com.oson</groupId>
+    <artifactId>npgenerator</artifactId> <!-- ✅ FIXED LINE -->
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>24</maven.compiler.source>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.4.0-jre</version> <!-- or latest -->
+            <version>33.4.0-jre</version>
         </dependency>
         <dependency>
             <groupId>org.rcsb</groupId>
@@ -40,7 +40,6 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>RELEASE</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

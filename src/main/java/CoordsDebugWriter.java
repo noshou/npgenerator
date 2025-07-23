@@ -1,32 +1,64 @@
-import org.apfloat.*;
-import java.io.*;
-import java.nio.file.*;
+import org.apfloat.Apfloat;
+import org.jetbrains.annotations.*;
+import java.io.IOException;
 
-class CoordsDebugWriter {
-    private final String file_name;
-    private final BufferedWriter writer;
-    private boolean is_finished = false;
-    public CoordsDebugWriter(String file_name) throws IOException {
-        // create tmp file
-        this.file_name = file_name + ".csv"; // full final name
-        Path temp_path = Paths.get(this.file_name + ".tmp"); // → test.cif.tmp
-        this.writer = Files.newBufferedWriter(temp_path);
+/**
+ * A writer for debugging atomic coordinates, exporting them in CSV format.
+ * <p>
+ * The output contains both fractional and Cartesian coordinates, along with
+ * an occupancy flag. This is primarily used for diagnostics or visualization.
+ */
+class CoordsDebugWriter extends FileBuilder {
+
+    /**
+     * Constructs a {@code CoordsDebugWriter} that writes to a CSV file.
+     *
+     * @param file_name The base name of the output file (without extension).
+     * @throws IOException If the underlying file cannot be created or opened for writing.
+     */
+    public CoordsDebugWriter(@NotNull String file_name) throws IOException {
+        super(file_name, ".csv");
     }
 
-    public void initLog() throws IOException {
-        writer.write(
-                "x_frac,y_frac,z_frac,x_cart,y_cart,z_cart,is_occupied\n"
-        );
+    /**
+     * Initializes the debug coordinate writer with a fixed CSV header.
+     * <p>
+     * This method must be called with a {@code null} initializer. Any non-null
+     * argument will result in an exception.
+     *
+     * @param initializer Must be {@code null}.
+     * @throws IOException              If writing the header fails.
+     * @throws IllegalArgumentException If {@code initializer} is not {@code null}.
+     */
+    @Override
+    @Contract("!null -> fail")  // if param is not null, throw exception
+    public void init(@Nullable Object initializer) throws IOException {
+        if (initializer != null) {
+            throw new IllegalArgumentException("initializer must be null!");
+        }
+        writer.write("x_frac,y_frac,z_frac,x_cart,y_cart,z_cart,is_occupied\n");
     }
 
-
+    /**
+     * Appends a line of coordinate data to the debug CSV file.
+     *
+     * @param x_frac      The fractional x-coordinate.
+     * @param y_frac      The fractional y-coordinate.
+     * @param z_frac      The fractional z-coordinate.
+     * @param x_cart      The Cartesian x-coordinate.
+     * @param y_cart      The Cartesian y-coordinate.
+     * @param z_cart      The Cartesian z-coordinate.
+     * @param is_occupied {@code true} if the site is occupied, {@code false} otherwise.
+     * @throws IOException If writing to the file fails.
+     */
+    @Contract(pure = false)
     public void addCoordinate(
-            Apfloat x_frac,
-            Apfloat y_frac,
-            Apfloat z_frac,
-            Apfloat x_cart,
-            Apfloat y_cart,
-            Apfloat z_cart,
+            @NotNull Apfloat x_frac,
+            @NotNull Apfloat y_frac,
+            @NotNull Apfloat z_frac,
+            @NotNull Apfloat x_cart,
+            @NotNull Apfloat y_cart,
+            @NotNull Apfloat z_cart,
             boolean is_occupied
     ) throws IOException {
         String line = String.format(
@@ -40,35 +72,5 @@ class CoordsDebugWriter {
                 is_occupied
         );
         writer.write(line);
-    }
-
-    /**
-      * Aborts the build and deletes the temporary file.
-      *
-      * @throws IOException If file deletion fails
-      */
-    public void abort() throws IOException {
-        writer.close();
-        Files.deleteIfExists(Paths.get(this.file_name + ".tmp"));
-    }
-
-    /**
-      * Finalizes and writes the file to disk.
-      *
-      * @throws IOException If file write fails
-      */
-    public void writeFile() throws IOException {
-        if (!is_finished) {
-            writer.close();
-
-            Files.move(
-                    Paths.get(this.file_name + ".tmp"),   // from
-                    Paths.get(this.file_name),            // to
-                    StandardCopyOption.ATOMIC_MOVE,
-                    StandardCopyOption.REPLACE_EXISTING   // optional: overwrites existing file
-            );
-
-            is_finished = true;
-        }
     }
 }

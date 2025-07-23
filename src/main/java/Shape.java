@@ -256,7 +256,7 @@ public abstract class Shape {
         NpMmcifBuilder file;
         try {
             file = new NpMmcifBuilder(this.file_name);
-            file.initShape(this.getThis());
+            file.init(this.getThis());
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -285,10 +285,9 @@ public abstract class Shape {
                         y_frac,
                         z_frac
                 );
-
                 if (curr_atom != null) {
                     curr_atom.latticePoint(
-                            index,
+                            (index+1),
                             new Triad<>(
                                     x_cart.toString(),
                                     y_cart.toString(),
@@ -305,9 +304,10 @@ public abstract class Shape {
                         }
                         throw new RuntimeException(e2);
                     }
+                    index++;
                 }
             }
-            index++;
+
             curr = this.getCoordinates().getPosition();
         }
 
@@ -345,7 +345,7 @@ public abstract class Shape {
         if (debug) {
             try {
                 dlog = new CoordsDebugWriter("build_debug_"+this.file_name);
-                dlog.initLog();
+                dlog.init(null);
             }
             catch (IOException e) {
                 throw new RuntimeException(e);
@@ -357,7 +357,7 @@ public abstract class Shape {
         NpMmcifBuilder file;
         try {
             file = new NpMmcifBuilder(this.file_name);
-            file.initShape(this.getThis());
+            file.init(this.getThis());
         }
         catch (IOException e) {
             if (dlog != null) {
