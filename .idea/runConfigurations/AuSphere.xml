@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="AuSphere" type="Application" factoryName="Application" folderName="AuNP">
+    <output_file path="test.txt" is_save="true" />
+    <option name="MAIN_CLASS_NAME" value="Examples.AuSphere" />
+    <module name="NpGenerator" />
+    <option name="VM_PARAMETERS" value="-Xmx8192m" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
