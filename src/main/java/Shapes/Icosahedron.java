@@ -8,7 +8,7 @@ import Lattice.*;
 import Atom.*;
 import Utilities.VectorMath;
 
-
+@SuppressWarnings("FieldCanBeLocal")
 public class Icosahedron extends Shape {
 
     // 20 triangle faces of the icosahedra
@@ -18,12 +18,12 @@ public class Icosahedron extends Shape {
     private final Icosad<Tuple<Apfloat>> face_norms;
 
     // constants
-    private final Apfloat NEG = new Apfloat("-1", precision);
-    private final Apfloat ZERO = new Apfloat("0", precision);
-    private final Apfloat ONE = new Apfloat("1", precision);
-    private final Apfloat TWO = new Apfloat ("2", precision);
-    private final Apfloat THREE = new Apfloat ("3", precision);
-    private final Apfloat FIVE = new Apfloat("5", precision);
+    private final Apfloat NEG_N1 = new Apfloat("-1", precision);
+    private final Apfloat N0 = new Apfloat("0", precision);
+    private final Apfloat N1 = new Apfloat("1", precision);
+    private final Apfloat N2 = new Apfloat ("2", precision);
+    private final Apfloat N3 = new Apfloat ("3", precision);
+    private final Apfloat N5 = new Apfloat("5", precision);
 
 
     /**
@@ -63,25 +63,25 @@ public class Icosahedron extends Shape {
         );
 
         // constants
-        Apfloat gold_ratio = ONE.add(ApfloatMath.sqrt(FIVE)).divide(TWO);
+        Apfloat gold_ratio = N1.add(ApfloatMath.sqrt(N5)).divide(N2);
 
         // indexed vertex basis points
-        Triad<Apfloat> vB0 = new Triad<>(ONE, gold_ratio, ZERO);                                 // +1, +φ, 0
-        Triad<Apfloat> vB1 = new Triad<>(ONE.multiply(NEG), gold_ratio, ZERO);                   // -1, +φ, 0
-        Triad<Apfloat> vB2 = new Triad<>(ONE.multiply(NEG), gold_ratio.multiply(NEG), ZERO);     // -1, -φ, 0
-        Triad<Apfloat> vB3 = new Triad<>(ONE, gold_ratio.multiply(NEG), ZERO);                   // +1, -φ, 0
-        Triad<Apfloat> vB4 = new Triad<>(gold_ratio, ZERO, ONE);                                 // +φ, 0, +1
-        Triad<Apfloat> vB5 = new Triad<>(gold_ratio, ZERO, ONE.multiply(NEG));                   // +φ, 0, -1
-        Triad<Apfloat> vB6 = new Triad<>(gold_ratio.multiply(NEG), ZERO, ONE.multiply(NEG));     // -φ, 0, -1
-        Triad<Apfloat> vB7 = new Triad<>(gold_ratio.multiply(NEG), ZERO, ONE);                   // -φ, 0, +1
-        Triad<Apfloat> vB8 = new Triad<>(ZERO, ONE, gold_ratio);                                 // 0, +1, +φ
-        Triad<Apfloat> vB9 = new Triad<>(ZERO, ONE.multiply(NEG), gold_ratio);                   // 0, -1, +φ
-        Triad<Apfloat> vB10 = new Triad<>(ZERO, ONE.multiply(NEG), gold_ratio.multiply(NEG));    // 0, -1, -φ
-        Triad<Apfloat> vB11 = new Triad<>(ZERO, ONE, gold_ratio.multiply(NEG));                  // 0, +1, -φ
+        Triad<Apfloat> vB0 = new Triad<>(N1, gold_ratio, N0);                                 // +1, +φ, 0
+        Triad<Apfloat> vB1 = new Triad<>(N1.multiply(NEG_N1), gold_ratio, N0);                   // -1, +φ, 0
+        Triad<Apfloat> vB2 = new Triad<>(N1.multiply(NEG_N1), gold_ratio.multiply(NEG_N1), N0);     // -1, -φ, 0
+        Triad<Apfloat> vB3 = new Triad<>(N1, gold_ratio.multiply(NEG_N1), N0);                   // +1, -φ, 0
+        Triad<Apfloat> vB4 = new Triad<>(gold_ratio, N0, N1);                                 // +φ, 0, +1
+        Triad<Apfloat> vB5 = new Triad<>(gold_ratio, N0, N1.multiply(NEG_N1));                   // +φ, 0, -1
+        Triad<Apfloat> vB6 = new Triad<>(gold_ratio.multiply(NEG_N1), N0, N1.multiply(NEG_N1));     // -φ, 0, -1
+        Triad<Apfloat> vB7 = new Triad<>(gold_ratio.multiply(NEG_N1), N0, N1);                   // -φ, 0, +1
+        Triad<Apfloat> vB8 = new Triad<>(N0, N1, gold_ratio);                                 // 0, +1, +φ
+        Triad<Apfloat> vB9 = new Triad<>(N0, N1.multiply(NEG_N1), gold_ratio);                   // 0, -1, +φ
+        Triad<Apfloat> vB10 = new Triad<>(N0, N1.multiply(NEG_N1), gold_ratio.multiply(NEG_N1));    // 0, -1, -φ
+        Triad<Apfloat> vB11 = new Triad<>(N0, N1, gold_ratio.multiply(NEG_N1));                  // 0, +1, -φ
 
 
         // dist from origin = sqrt(x²+y²+z²) = sqrt(φ²+1²) = sqrt(φ²+1)
-        Apfloat dist = ApfloatMath.sqrt(ONE.add(ApfloatMath.pow(gold_ratio, 2)));
+        Apfloat dist = ApfloatMath.sqrt(N1.add(ApfloatMath.pow(gold_ratio, 2)));
         Apfloat r = super.getRadius();
         String r_dist = r.divide(dist).toString();
 
@@ -160,15 +160,15 @@ public class Icosahedron extends Shape {
             Apfloat c_x =   vertA.fetch(0)
                     .add(vertB.fetch(0))
                     .add(vertC.fetch(0))
-                    .divide(THREE);
+                    .divide(N3);
             Apfloat c_y =   vertA.fetch(1)
                     .add(vertB.fetch(1))
                     .add(vertC.fetch(1))
-                    .divide(THREE);
+                    .divide(N3);
             Apfloat c_z =   vertA.fetch(2)
                     .add(vertB.fetch(2))
                     .add(vertC.fetch(2))
-                    .divide(THREE);
+                    .divide(N3);
             Triad<Apfloat> c = new Triad<>(c_x, c_y, c_z);
 
             // compute dot product of c and n_norm
@@ -177,7 +177,7 @@ public class Icosahedron extends Shape {
 
             // w < 0 =>  n_norm points inwards;
             // if above is true, flip such that  n_norm points outwards (negate  n_norm)
-            if (w.compareTo(ZERO) < 0) {
+            if (w.compareTo(N0) < 0) {
                 norms.add(VectorMath.mult(n_norm, "-1"));
             }
             else {
@@ -247,7 +247,7 @@ public class Icosahedron extends Shape {
             // if d < 0,  point lies behind face (within bounds)
             // if d == 0, point lies on face (within bounds)
             // if d > 0,  point lies in front of face (out of bounds)
-            if (d.compareTo(ZERO) > 0) {
+            if (d.compareTo(N0) > 0) {
                 return false;
             }
         }

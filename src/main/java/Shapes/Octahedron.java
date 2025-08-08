@@ -13,6 +13,7 @@ import Utilities.VectorMath;
  *
  * <p>An octahedron has 8 triangular faces, 12 edges, and 6 vertices.</p>
  */
+@SuppressWarnings("FieldCanBeLocal")
 public class Octahedron extends Shape {
 
     private final Octad<Tuple<Tuple<Apfloat>>> faces_tri;
@@ -25,18 +26,18 @@ public class Octahedron extends Shape {
     ) {
         super(radius, radius_type, lattice_type, precision, basis, lattice_constant, file_name, structure_name, structure_index);
 
-        Apfloat ZERO = new Apfloat("0", precision);
-        Apfloat ONE = new Apfloat("1", precision);
-        Apfloat NEG = new Apfloat("-1", precision);
+        Apfloat N0 = new Apfloat("0", precision);
+        Apfloat N1 = new Apfloat("1", precision);
+        Apfloat NEG_N1 = new Apfloat("-1", precision);
 
         // === Canonical vertices ===
         ArrayList<Triad<Apfloat>> v = new ArrayList<>();
-        v.add(new Triad<>( ONE,  ZERO, ZERO));
-        v.add(new Triad<>(NEG,  ZERO, ZERO));
-        v.add(new Triad<>( ZERO,  ONE, ZERO));
-        v.add(new Triad<>( ZERO, NEG, ZERO));
-        v.add(new Triad<>( ZERO, ZERO,  ONE));
-        v.add(new Triad<>( ZERO, ZERO, NEG));
+        v.add(new Triad<>( N1,  N0, N0));
+        v.add(new Triad<>(NEG_N1,  N0, N0));
+        v.add(new Triad<>( N0,  N1, N0));
+        v.add(new Triad<>( N0, NEG_N1, N0));
+        v.add(new Triad<>( N0, N0,  N1));
+        v.add(new Triad<>( N0, N0, NEG_N1));
 
         // Scale (already unit length → radius)
         Apfloat scale = super.getRadius();
@@ -70,7 +71,7 @@ public class Octahedron extends Shape {
 
     @Override
     protected boolean inBounds(@NotNull Triad<Apfloat> point_cart) {
-        Apfloat ZERO = new Apfloat("0", super.precision);
+        Apfloat N0 = new Apfloat("0", super.precision);
         Apfloat THREE = new Apfloat("3", super.precision);
 
         for (int i = 0; i < faces_tri.fetchSize(); i++) {
@@ -87,7 +88,7 @@ public class Octahedron extends Shape {
             Triad<Apfloat> m = VectorMath.subs(point_cart, centroid);
             Triad<Apfloat> norm = (Triad<Apfloat>) face_norms_tri.fetch(i);
             Apfloat d = VectorMath.dot_prod(norm, m);
-            if (d.compareTo(ZERO) > 0) return false;
+            if (d.compareTo(N0) > 0) return false;
         }
         return true;
     }

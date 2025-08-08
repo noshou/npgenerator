@@ -7,6 +7,7 @@ import org.jetbrains.annotations.*;
 import Lattice.*;
 import Atom.*;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class Cuboctahedron extends Shape {
 
     // the 6 square faces
@@ -18,11 +19,11 @@ public class Cuboctahedron extends Shape {
     private final Octad<Tuple<Apfloat>> face_norms_tri;
 
     // Apfloat constants
-    private final Apfloat NEG = new Apfloat("-1", super.precision);
-    private final Apfloat ZERO = new Apfloat("0", super.precision);
-    private final Apfloat ONE = new Apfloat("1", super.precision);
-    private final Apfloat THREE = new Apfloat("3", super.precision);
-    private final Apfloat FOUR = new Apfloat("4", super.precision);
+    private final Apfloat NEG_N1 = new Apfloat("-1", super.precision);
+    private final Apfloat N0 = new Apfloat("0", super.precision);
+    private final Apfloat N1 = new Apfloat("1", super.precision);
+    private final Apfloat N3 = new Apfloat("3", super.precision);
+    private final Apfloat N4 = new Apfloat("4", super.precision);
 
     public Cuboctahedron(
             @NotNull String radius,
@@ -50,26 +51,26 @@ public class Cuboctahedron extends Shape {
         // ==== CANONICAL BASIS VERTICES ====
 
         // (±1,±1,0)
-        Triad<Apfloat> vB0 = new Triad<>(ONE, ONE, ZERO);    // (+1, +1, 0)
-        Triad<Apfloat> vB1 = new Triad<>(ONE, NEG, ZERO);    // (+1, -1, 0)
-        Triad<Apfloat> vB2 = new Triad<>(NEG, ONE, ZERO);    // (-1, +1, 0)
-        Triad<Apfloat> vB3 = new Triad<>(NEG, NEG, ZERO);    // (-1, -1, 0)
+        Triad<Apfloat> vB0 = new Triad<>(N1, N1, N0);    // (+1, +1, 0)
+        Triad<Apfloat> vB1 = new Triad<>(N1, NEG_N1, N0);    // (+1, -1, 0)
+        Triad<Apfloat> vB2 = new Triad<>(NEG_N1, N1, N0);    // (-1, +1, 0)
+        Triad<Apfloat> vB3 = new Triad<>(NEG_N1, NEG_N1, N0);    // (-1, -1, 0)
 
         // (±1,0,±1)
-        Triad<Apfloat> vB4 = new Triad<>(ONE, ZERO, ONE);    // (+1, 0, +1)
-        Triad<Apfloat> vB5 = new Triad<>(ONE, ZERO, NEG);    // (+1, 0, -1)
-        Triad<Apfloat> vB6 = new Triad<>(NEG, ZERO, ONE);    // (-1, 0, +1)
-        Triad<Apfloat> vB7 = new Triad<>(NEG, ZERO, NEG);    // (-1, 0, -1)
+        Triad<Apfloat> vB4 = new Triad<>(N1, N0, N1);    // (+1, 0, +1)
+        Triad<Apfloat> vB5 = new Triad<>(N1, N0, NEG_N1);    // (+1, 0, -1)
+        Triad<Apfloat> vB6 = new Triad<>(NEG_N1, N0, N1);    // (-1, 0, +1)
+        Triad<Apfloat> vB7 = new Triad<>(NEG_N1, N0, NEG_N1);    // (-1, 0, -1)
 
         // (0,±1,±1)
-        Triad<Apfloat> vB8 = new Triad<>(ZERO, ONE, ONE);    // (0, +1, +1)
-        Triad<Apfloat> vB9 = new Triad<>(ZERO, ONE, NEG);    // (0, +1, -1)
-        Triad<Apfloat> vB10= new Triad<>(ZERO, NEG, ONE);    // (0, -1, +1)
-        Triad<Apfloat> vB11= new Triad<>(ZERO, NEG, NEG);    // (0, -1, -1)
+        Triad<Apfloat> vB8 = new Triad<>(N0, N1, N1);    // (0, +1, +1)
+        Triad<Apfloat> vB9 = new Triad<>(N0, N1, NEG_N1);    // (0, +1, -1)
+        Triad<Apfloat> vB10= new Triad<>(N0, NEG_N1, N1);    // (0, -1, +1)
+        Triad<Apfloat> vB11= new Triad<>(N0, NEG_N1, NEG_N1);    // (0, -1, -1)
 
         // ==== SCALING FACTOR ====
         // dist from origin = sqrt(x²+y²+z²) = sqrt(1²+1²) = sqrt(2)
-        Apfloat dist = ApfloatMath.sqrt(ONE.add(ONE));
+        Apfloat dist = ApfloatMath.sqrt(N1.add(N1));
         Apfloat r = super.getRadius();
         String r_dist = r.divide(dist).toString();
 
@@ -234,9 +235,9 @@ public class Cuboctahedron extends Shape {
 
                 // centroid of square
                 Triad<Apfloat> centroid = new Triad<>(
-                        vert0.fetch(0).add(vert1.fetch(0)).add(vert2.fetch(0)).add(vert3.fetch(0)).divide(FOUR),
-                        vert0.fetch(1).add(vert1.fetch(1)).add(vert2.fetch(1)).add(vert3.fetch(1)).divide(FOUR),
-                        vert0.fetch(2).add(vert1.fetch(2)).add(vert2.fetch(2)).add(vert3.fetch(2)).divide(FOUR)
+                        vert0.fetch(0).add(vert1.fetch(0)).add(vert2.fetch(0)).add(vert3.fetch(0)).divide(N4),
+                        vert0.fetch(1).add(vert1.fetch(1)).add(vert2.fetch(1)).add(vert3.fetch(1)).divide(N4),
+                        vert0.fetch(2).add(vert1.fetch(2)).add(vert2.fetch(2)).add(vert3.fetch(2)).divide(N4)
                 );
 
                 // given point p and vertA, calculate vector from centroid -> p:
@@ -253,7 +254,7 @@ public class Cuboctahedron extends Shape {
                 Apfloat d = VectorMath.dot_prod(norm, m);
 
                 // point outside if dot product > 0
-                if (d.compareTo(ZERO) > 0) {
+                if (d.compareTo(N0) > 0) {
                     return false;
                 }
             }
@@ -266,9 +267,9 @@ public class Cuboctahedron extends Shape {
 
             // centroid of triangle
             Triad<Apfloat> centroid = new Triad<>(
-                    vert0.fetch(0).add(vert1.fetch(0)).add(vert2.fetch(0)).divide(THREE),
-                    vert0.fetch(1).add(vert1.fetch(1)).add(vert2.fetch(1)).divide(THREE),
-                    vert0.fetch(2).add(vert1.fetch(2)).add(vert2.fetch(2)).divide(THREE)
+                    vert0.fetch(0).add(vert1.fetch(0)).add(vert2.fetch(0)).divide(N3),
+                    vert0.fetch(1).add(vert1.fetch(1)).add(vert2.fetch(1)).divide(N3),
+                    vert0.fetch(2).add(vert1.fetch(2)).add(vert2.fetch(2)).divide(N3)
             );
 
             // given point p and vertA, calculate vector from centroid -> p:
@@ -285,7 +286,7 @@ public class Cuboctahedron extends Shape {
             Apfloat d = VectorMath.dot_prod(norm, m);
 
             // point outside if dot product > 0
-            if (d.compareTo(ZERO) > 0) {
+            if (d.compareTo(N0) > 0) {
                 return false;
             }
         }

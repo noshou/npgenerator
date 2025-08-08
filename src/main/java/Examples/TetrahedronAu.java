@@ -1,0 +1,135 @@
+package Examples;
+
+import Atom.Atom;
+import Lattice.LatticeType;
+import Shapes.Shape;
+import Shapes.Tetrahedron;
+import Utilities.FormatExecTime;
+import com.oson.tuple.Polyad;
+import com.oson.tuple.Triad;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Constructs and benchmarks a gold (Au) nanoparticle using
+ * a face-centered cubic (FCC) lattice.
+ * <p>
+ * This class generates a default FCC atomic basis for gold and builds a
+ * spherical nanoparticle using the {@link Tetrahedron} class,
+ * configured with user-defined radius, precision, and lattice parameters.
+ * </p>
+ */
+public class TetrahedronAu {
+
+    /**
+     * Returns a default FCC basis for gold (Au) containing four atoms
+     * located at the standard fractional positions within the FCC unit cell.
+     * <p>
+     * Each atom is initialized with:
+     * <ul>
+     *   <li>Element: "Au"</li>
+     *   <li>Atomic radius: 1.44 Å (as a string)</li>
+     *   <li>Fractional coordinates: FCC standard positions</li>
+     *   <li>B-factor: 0</li>
+     *   <li>Unique index: 100</li>
+     * </ul>
+     * </p>
+     *
+     * @return a non-null {@link Polyad} containing the FCC atomic basis for gold
+     *
+     * @implNote All atoms share the same radius and index,
+     * and are positioned for symmetry.
+     */
+    @Contract(" -> new")
+    private static @NotNull Polyad<Atom> getBasis() {
+        Atom _1 = new Atom(
+                "Au",
+                "1.44",
+                new Triad<>("0", "0", "0"),
+                0,
+                100
+        );
+        Atom _2 = new Atom(
+                "Au",
+                "1.44",
+                new Triad<>("0.5", "0.5", "0"),
+                0,
+                100
+        );
+        Atom _3 = new Atom(
+                "Au",
+                "1.44",
+                new Triad<>("0.5", "0", "0.5"),
+                0,
+                100
+        );
+        Atom _4 = new Atom(
+                "Au",
+                "1.44",
+                new Triad<>("0", "0.5", "0.5"),
+                0,
+                100
+        );
+        Atom[] atoms = new Atom[]{_1, _2, _3, _4};
+        return new Polyad<>(atoms);
+    }
+
+    /**
+     * The main entry point for building and benchmarking a
+     * gold FCC spherical nanoparticle.
+     * <p>
+     * It creates a {@link Tetrahedron} using a specified radius and lattice constant,
+     * builds the structure, and prints the execution time in a human-readable format.
+     * </p>
+     *
+     * @param args the command-line arguments (not used)
+     */
+    public static void main(String @NotNull [] args) {
+        long start_time_init = System.nanoTime();
+
+        // Configuration parameters
+        String radius = "7.5"; // in nanometers
+        String units = "nm";
+        LatticeType lattice_type = LatticeType.FCC;
+        int precision = 500;
+        Polyad<Atom> atoms = getBasis();
+        String lattice_constant = "4.33"; // Ångstroms
+        String id = "TetrahedronAu";
+
+        System.out.println("\nNanoparticle Radius:  \t" + radius + " " + units);
+
+        long end_time_init = System.nanoTime();
+        System.out.println(
+                "Init time:   \t" + FormatExecTime.formatDuration(
+                        (end_time_init - start_time_init)
+                ) + "\n"
+        );
+        // Create and build the nanoparticle
+        Shape auTetrahedron = new Tetrahedron(
+                radius,
+                units,
+                lattice_type,
+                precision,
+                atoms,
+                lattice_constant,
+                id, // label
+                id, // CIF ID
+                id  // output file stem
+        );
+
+        auTetrahedron.build();
+
+        long end_time_build = System.nanoTime();
+
+        System.out.println(
+                "Build time:  \t" + FormatExecTime.formatDuration(
+                        (end_time_build - end_time_init)
+                ) + "\n"
+        );
+        System.out.println(
+                "Exec time:   \t" + FormatExecTime.formatDuration(
+                        (end_time_build - start_time_init)
+                ) + "\n"
+        );
+    }
+}

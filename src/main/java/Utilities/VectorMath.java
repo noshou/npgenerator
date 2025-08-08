@@ -316,7 +316,6 @@ public final class VectorMath {
      * @return a unit normal vector pointing outward from the face
      * @throws NullPointerException if any vertex or component is {@code null}
      * @throws ArithmeticException if the vertices are collinear (cannot compute normal)
-     * @see #normalQuad(Triad, Triad, Triad, Triad)
      * @see #cross_prod(Triad, Triad)
      * @see #normalize(Triad)
      */
@@ -350,6 +349,341 @@ public final class VectorMath {
             );
             Apfloat dot = dot_prod(n_norm, centroid);
             if (dot.compareTo(ZERO) < 0) {
+                return mult(n_norm, "-1");
+            }
+        }
+        return n_norm;
+    }
+
+    /**
+     * Computes an outward-pointing normal vector for an octagonal face.
+     *
+     * <p>This method calculates the normal vector for a face defined by
+     * eight vertices. The normal is determined from two edge vectors,
+     * and if {@code out} is set to true, it is oriented to point
+     * outward by comparing with the face centroid.</p>
+     *
+     * @param v0 the first vertex of the octagon, must not be null
+     * @param v1 the second vertex of the octagon, must not be null
+     * @param v2 the third vertex of the octagon, must not be null
+     * @param v3 the fourth vertex of the octagon, must not be null
+     * @param v4 the fifth vertex of the octagon, must not be null
+     * @param v5 the sixth vertex of the octagon, must not be null
+     * @param v6 the seventh vertex of the octagon, must not be null
+     * @param v7 the eighth vertex of the octagon, must not be null
+     * @param out whether the vector should be forced to point outwards
+     * @return a unit normal vector pointing outward from the face
+     * @throws NullPointerException if any vertex or component is {@code null}
+     * @throws ArithmeticException if the vertices are collinear (cannot compute normal)
+     * @see #cross_prod(Triad, Triad)
+     * @see #normalize(Triad)
+     */
+    @Contract(pure = true)
+    public static @NotNull Triad<@NotNull Apfloat> normalOct(
+            @NotNull Triad<@NotNull Apfloat> v0,
+            @NotNull Triad<@NotNull Apfloat> v1,
+            @NotNull Triad<@NotNull Apfloat> v2,
+            @NotNull Triad<@NotNull Apfloat> v3,
+            @NotNull Triad<@NotNull Apfloat> v4,
+            @NotNull Triad<@NotNull Apfloat> v5,
+            @NotNull Triad<@NotNull Apfloat> v6,
+            @NotNull Triad<@NotNull Apfloat> v7,
+            boolean out
+    ) {
+        // Edge vectors from v0
+        Triad<Apfloat> u = subs(v1, v0);
+        Triad<Apfloat> v = subs(v2, v0);
+
+        // Cross product u × v gives the raw normal
+        Triad<Apfloat> n = cross_prod(u, v);
+        Triad<Apfloat> n_norm = normalize(n);
+
+        if (out) {
+            // Compute face centroid (average of 8 vertices)
+            long precision = v0.fetch(0).precision();
+            Apfloat EIGHT = new Apfloat("8", precision);
+
+            Triad<Apfloat> sum = add(
+                    add(add(v0, v1), add(v2, v3)),
+                    add(add(v4, v5), add(v6, v7))
+            );
+
+            Triad<Apfloat> centroid = new Triad<>(
+                    sum.fetch(0).divide(EIGHT),
+                    sum.fetch(1).divide(EIGHT),
+                    sum.fetch(2).divide(EIGHT)
+            );
+
+            Apfloat dot = dot_prod(n_norm, centroid);
+            if (dot.signum() < 0) {
+                return mult(n_norm, "-1");
+            }
+        }
+        return n_norm;
+    }
+
+    /**
+     * Computes an outward-pointing normal vector for a hexagonal face.
+     *
+     * <p>This method calculates the normal vector for a face defined by
+     * six vertices. The normal is determined from two edge vectors,
+     * and if {@code out} is set to true, it is oriented to point
+     * outward by comparing with the face centroid.</p>
+     *
+     * @param v0 the first vertex of the hexagon, must not be null
+     * @param v1 the second vertex of the hexagon, must not be null
+     * @param v2 the third vertex of the hexagon, must not be null
+     * @param v3 the fourth vertex of the hexagon, must not be null
+     * @param v4 the fifth vertex of the hexagon, must not be null
+     * @param v5 the sixth vertex of the hexagon, must not be null
+     * @param out whether the vector should be forced to point outwards
+     * @return a unit normal vector pointing outward from the face
+     * @throws NullPointerException if any vertex or component is {@code null}
+     * @throws ArithmeticException if the vertices are collinear (cannot compute normal)
+     * @see #cross_prod(Triad, Triad)
+     * @see #normalize(Triad)
+     */
+    @Contract(pure = true)
+    public static @NotNull Triad<@NotNull Apfloat> normalHex(
+            @NotNull Triad<@NotNull Apfloat> v0,
+            @NotNull Triad<@NotNull Apfloat> v1,
+            @NotNull Triad<@NotNull Apfloat> v2,
+            @NotNull Triad<@NotNull Apfloat> v3,
+            @NotNull Triad<@NotNull Apfloat> v4,
+            @NotNull Triad<@NotNull Apfloat> v5,
+            boolean out
+    ) {
+        // Edge vectors from v0
+        Triad<Apfloat> u = subs(v1, v0);
+        Triad<Apfloat> v = subs(v2, v0);
+
+        // Cross product u × v gives the raw normal
+        Triad<Apfloat> n = cross_prod(u, v);
+        Triad<Apfloat> n_norm = normalize(n);
+
+        if (out) {
+            // Compute face centroid (average of 6 vertices)
+            long precision = v0.fetch(0).precision();
+            Apfloat SIX = new Apfloat("6", precision);
+
+            Triad<Apfloat> sum = add(
+                    add(add(v0, v1), add(v2, v3)),
+                    add(v4, v5)
+            );
+
+            Triad<Apfloat> centroid = new Triad<>(
+                    sum.fetch(0).divide(SIX),
+                    sum.fetch(1).divide(SIX),
+                    sum.fetch(2).divide(SIX)
+            );
+
+            Apfloat dot = dot_prod(n_norm, centroid);
+            if (dot.signum() < 0) {
+                return mult(n_norm, "-1");
+            }
+        }
+        return n_norm;
+    }
+
+    /**
+     * Computes an outward-pointing normal vector for a dodecagonal face.
+     *
+     * <p>This method calculates the normal vector for a face defined by
+     * twelve vertices. The normal is determined from two edge vectors,
+     * and if {@code out} is set to true, it is oriented to point
+     * outward by comparing with the face centroid.</p>
+     *
+     * @param v0  the first vertex of the dodecagon, must not be null
+     * @param v1  the second vertex of the dodecagon, must not be null
+     * @param v2  the third vertex of the dodecagon, must not be null
+     * @param v3  the fourth vertex of the dodecagon, must not be null
+     * @param v4  the fifth vertex of the dodecagon, must not be null
+     * @param v5  the sixth vertex of the dodecagon, must not be null
+     * @param v6  the seventh vertex of the dodecagon, must not be null
+     * @param v7  the eighth vertex of the dodecagon, must not be null
+     * @param v8  the ninth vertex of the dodecagon, must not be null
+     * @param v9  the tenth vertex of the dodecagon, must not be null
+     * @param v10 the eleventh vertex of the dodecagon, must not be null
+     * @param v11 the twelfth vertex of the dodecagon, must not be null
+     * @param out whether the vector should be forced to point outwards
+     * @return a unit normal vector pointing outward from the face
+     * @throws NullPointerException if any vertex or component is {@code null}
+     * @throws ArithmeticException if the vertices are collinear (cannot compute normal)
+     * @see #cross_prod(Triad, Triad)
+     * @see #normalize(Triad)
+     */
+    @Contract(pure = true)
+    public static @NotNull Triad<@NotNull Apfloat> normalDodeca (
+            @NotNull Triad<@NotNull Apfloat> v0,
+            @NotNull Triad<@NotNull Apfloat> v1,
+            @NotNull Triad<@NotNull Apfloat> v2,
+            @NotNull Triad<@NotNull Apfloat> v3,
+            @NotNull Triad<@NotNull Apfloat> v4,
+            @NotNull Triad<@NotNull Apfloat> v5,
+            @NotNull Triad<@NotNull Apfloat> v6,
+            @NotNull Triad<@NotNull Apfloat> v7,
+            @NotNull Triad<@NotNull Apfloat> v8,
+            @NotNull Triad<@NotNull Apfloat> v9,
+            @NotNull Triad<@NotNull Apfloat> v10,
+            @NotNull Triad<@NotNull Apfloat> v11,
+            boolean out
+    ) {
+        // Edge vectors from v0
+        Triad<Apfloat> u = subs(v1, v0);
+        Triad<Apfloat> v = subs(v2, v0);
+
+        // Cross product u × v gives the raw normal
+        Triad<Apfloat> n = cross_prod(u, v);
+        Triad<Apfloat> n_norm = normalize(n);
+
+        if (out) {
+            // Compute face centroid (average of 12 vertices)
+            long precision = v0.fetch(0).precision();
+            Apfloat TWELVE = new Apfloat("12", precision);
+
+            Triad<Apfloat> sum = add(
+                    add(add(add(v0, v1), add(v2, v3)), add(add(v4, v5), add(v6, v7))),
+                    add(add(v8, v9), add(v10, v11))
+            );
+
+            Triad<Apfloat> centroid = new Triad<>(
+                    sum.fetch(0).divide(TWELVE),
+                    sum.fetch(1).divide(TWELVE),
+                    sum.fetch(2).divide(TWELVE)
+            );
+
+            Apfloat dot = dot_prod(n_norm, centroid);
+            if (dot.signum() < 0) {
+                return mult(n_norm, "-1");
+            }
+        }
+        return n_norm;
+    }
+
+    /**
+     * Computes an outward-pointing normal vector for a pentagonal face.
+     *
+     * <p>This method calculates the normal vector for a face defined by
+     * five vertices. The normal is determined from two edge vectors,
+     * and if {@code out} is set to true, it is oriented to point
+     * outward by comparing with the face centroid.</p>
+     *
+     * @param v0 the first vertex of the pentagon, must not be null
+     * @param v1 the second vertex of the pentagon, must not be null
+     * @param v2 the third vertex of the pentagon, must not be null
+     * @param v3 the fourth vertex of the pentagon, must not be null
+     * @param v4 the fifth vertex of the pentagon, must not be null
+     * @param out whether the vector should be forced to point outwards
+     * @return a unit normal vector pointing outward from the face
+     * @throws NullPointerException if any vertex or component is {@code null}
+     * @throws ArithmeticException if the vertices are collinear (cannot compute normal)
+     * @see #cross_prod(Triad, Triad)
+     * @see #normalize(Triad)
+     */
+    @Contract(pure = true)
+    public static @NotNull Triad<@NotNull Apfloat> normalPent(
+            @NotNull Triad<@NotNull Apfloat> v0,
+            @NotNull Triad<@NotNull Apfloat> v1,
+            @NotNull Triad<@NotNull Apfloat> v2,
+            @NotNull Triad<@NotNull Apfloat> v3,
+            @NotNull Triad<@NotNull Apfloat> v4,
+            boolean out
+    ) {
+        // Edge vectors from v0
+        Triad<Apfloat> u = subs(v1, v0);
+        Triad<Apfloat> v = subs(v2, v0);
+
+        // Cross product u × v gives the raw normal
+        Triad<Apfloat> n = cross_prod(u, v);
+        Triad<Apfloat> n_norm = normalize(n);
+
+        if (out) {
+            // Compute face centroid (average of 5 vertices)
+            long precision = v0.fetch(0).precision();
+            Apfloat FIVE = new Apfloat("5", precision);
+
+            Triad<Apfloat> sum = add(add(v0, v1), add(add(v2, v3), v4));
+
+            Triad<Apfloat> centroid = new Triad<>(
+                    sum.fetch(0).divide(FIVE),
+                    sum.fetch(1).divide(FIVE),
+                    sum.fetch(2).divide(FIVE)
+            );
+
+            Apfloat dot = dot_prod(n_norm, centroid);
+            if (dot.signum() < 0) {
+                return mult(n_norm, "-1");
+            }
+        }
+        return n_norm;
+    }
+
+    /**
+     * Computes an outward-pointing normal vector for a decagonal face.
+     *
+     * <p>This method calculates the normal vector for a face defined by
+     * ten vertices. The normal is determined from two edge vectors,
+     * and if {@code out} is set to true, it is oriented to point
+     * outward by comparing with the face centroid.</p>
+     *
+     * @param v0 the first vertex of the decagon, must not be null
+     * @param v1 the second vertex of the decagon, must not be null
+     * @param v2 the third vertex of the decagon, must not be null
+     * @param v3 the fourth vertex of the decagon, must not be null
+     * @param v4 the fifth vertex of the decagon, must not be null
+     * @param v5 the sixth vertex of the decagon, must not be null
+     * @param v6 the seventh vertex of the decagon, must not be null
+     * @param v7 the eighth vertex of the decagon, must not be null
+     * @param v8 the ninth vertex of the decagon, must not be null
+     * @param v9 the tenth vertex of the decagon, must not be null
+     * @param out whether the vector should be forced to point outwards
+     * @return a unit normal vector pointing outward from the face
+     * @throws NullPointerException if any vertex or component is {@code null}
+     * @throws ArithmeticException if the vertices are collinear (cannot compute normal)
+     * @see #cross_prod(Triad, Triad)
+     * @see #normalize(Triad)
+     */
+    @Contract(pure = true)
+    public static @NotNull Triad<@NotNull Apfloat> normalDeca(
+            @NotNull Triad<@NotNull Apfloat> v0,
+            @NotNull Triad<@NotNull Apfloat> v1,
+            @NotNull Triad<@NotNull Apfloat> v2,
+            @NotNull Triad<@NotNull Apfloat> v3,
+            @NotNull Triad<@NotNull Apfloat> v4,
+            @NotNull Triad<@NotNull Apfloat> v5,
+            @NotNull Triad<@NotNull Apfloat> v6,
+            @NotNull Triad<@NotNull Apfloat> v7,
+            @NotNull Triad<@NotNull Apfloat> v8,
+            @NotNull Triad<@NotNull Apfloat> v9,
+            boolean out
+    ) {
+        // Edge vectors from v0
+        Triad<Apfloat> u = subs(v1, v0);
+        Triad<Apfloat> v = subs(v2, v0);
+
+        // Cross product u × v gives the raw normal
+        Triad<Apfloat> n = cross_prod(u, v);
+        Triad<Apfloat> n_norm = normalize(n);
+
+        if (out) {
+            // Compute face centroid (average of 10 vertices)
+            long precision = v0.fetch(0).precision();
+            Apfloat N0 = new Apfloat("0", precision);
+            Apfloat N10 = new Apfloat("10", precision);
+
+            Triad<Apfloat> sum = add(
+                    add(add(add(add(v0, v1), add(v2, v3)), add(add(v4, v5), add(v6, v7))), add(v8, v9)),
+                    new Triad<>(N0, N0, N0)
+            );
+
+            Triad<Apfloat> centroid = new Triad<>(
+                    sum.fetch(0).divide(N10),
+                    sum.fetch(1).divide(N10),
+                    sum.fetch(2).divide(N10)
+            );
+
+            Apfloat dot = dot_prod(n_norm, centroid);
+            if (dot.signum() < 0) {
                 return mult(n_norm, "-1");
             }
         }

@@ -1,35 +1,28 @@
 package Shapes;
-
 import Utilities.VectorMath;
 import com.oson.tuple.*;
-import org.apfloat.*;
+import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
 import org.jetbrains.annotations.*;
-import java.util.*;
 import Lattice.*;
 import Atom.*;
 
 /**
- * Represents a regular tetrahedron inscribed in a sphere of given radius.
- *
- * <p>A tetrahedron has 4 triangular faces, 6 edges, and 4 vertices.</p>
+ * {@link:<a href=https://dmccooey.com/polyhedra/Tetrahedron.txt...</a>}
  */
-public class Tetrahedron extends Shape {
+public class Tetrahedron extends Shape{
 
-    /** 4 triangular faces */
-    private final Tetrad<Tuple<Tuple<Apfloat>>> faces_tri;
+    // 4 triangular faces
+    Tetrad<Tuple<Tuple<Apfloat>>> faces_tri;
+    Tetrad<Tuple<Apfloat>> face_norms_tri;
 
-    /** Normals of the 4 triangular faces */
-    private final Tetrad<Tuple<Apfloat>> face_norms_tri;
+    // Apfloat constant
+    private final Apfloat NEG_N1 = new Apfloat("-1", super.precision);
+    private final Apfloat N0 = new Apfloat("0", super.precision);
+    private final Apfloat N4 = new Apfloat("4", super.precision);
+    private final Apfloat SQRT2 = ApfloatMath.sqrt(new Apfloat("2", super.precision));
+    private final Apfloat C0 = SQRT2.divide(N4);
 
-    // === Constants ===
-    private final Apfloat ONE = new Apfloat("1", precision);
-    private final Apfloat NEG = new Apfloat("-1", precision);
-    private final Apfloat ZERO = new Apfloat("0", super.precision);
-    private final Apfloat THREE = new Apfloat("3", super.precision);
-
-    /**
-     * Constructs a tetrahedron.
-     */
     public Tetrahedron(
             @NotNull String radius,
             @NotNull String radius_type,
@@ -41,61 +34,68 @@ public class Tetrahedron extends Shape {
             @NotNull String structure_name,
             @NotNull String structure_index
     ) {
-        super(radius, radius_type, lattice_type, precision, basis, lattice_constant, file_name, structure_name, structure_index);
+        super(
+                radius,
+                radius_type,
+                lattice_type,
+                precision,
+                basis,
+                lattice_constant,
+                file_name,
+                structure_name,
+                structure_index
+        );
 
+        // ==== CANONICAL BASIS VERTICES ====
+        Triad<Apfloat> vB0 = new Triad<>(C0, C0.multiply(NEG_N1), C0);
+        Triad<Apfloat> vB1 = new Triad<>(C0, C0, C0.multiply(NEG_N1));
+        Triad<Apfloat> vB2 = new Triad<>(C0.multiply(NEG_N1), C0, C0);
+        Triad<Apfloat> vB3 = new Triad<>(C0.multiply(NEG_N1), C0.multiply(NEG_N1), C0.multiply(NEG_N1));
 
-        // === Canonical vertices (tetrahedron centered at origin) ===
-        // Using coordinates: (1,1,1), (1,-1,-1), (-1,1,-1), (-1,-1,1)
-        ArrayList<Triad<Apfloat>> v = new ArrayList<>();
-        v.add(new Triad<>( ONE,  ONE,  ONE));
-        v.add(new Triad<>( ONE, NEG, NEG));
-        v.add(new Triad<>(NEG,  ONE, NEG));
-        v.add(new Triad<>(NEG, NEG,  ONE));
+        // ==== SCALED VERTICES ====
+        Triad<Apfloat> vC0  = VectorMath.mult(VectorMath.normalize(vB0),  super.getRadius().toString());
+        Triad<Apfloat> vC1  = VectorMath.mult(VectorMath.normalize(vB1),  super.getRadius().toString());
+        Triad<Apfloat> vC2  = VectorMath.mult(VectorMath.normalize(vB2),  super.getRadius().toString());
+        Triad<Apfloat> vC3  = VectorMath.mult(VectorMath.normalize(vB3),  super.getRadius().toString());
 
-        // Scale to circumsphere radius
-        Apfloat dist = ApfloatMath.sqrt(new Apfloat("3", precision)); // |(1,1,1)|
-        Apfloat scale = super.getRadius().divide(dist);
-        List<Triad<Apfloat>> vScaled = v.stream().map(v_i -> VectorMath.mult(v_i, scale.toString())).toList();
-
-        // === Define 4 triangular faces ===
-        ArrayList<Triad<Tuple<Apfloat>>> tr = new ArrayList<>();
-        tr.add(new Triad<>(vScaled.get(0), vScaled.get(1), vScaled.get(2)));
-        tr.add(new Triad<>(vScaled.get(0), vScaled.get(3), vScaled.get(1)));
-        tr.add(new Triad<>(vScaled.get(0), vScaled.get(2), vScaled.get(3)));
-        tr.add(new Triad<>(vScaled.get(1), vScaled.get(3), vScaled.get(2)));
-
-        // Compute normals
-        List<Triad<Apfloat>> trn = tr.stream().map(
-                tr_i -> VectorMath.normalTriple(
-                        (Triad<Apfloat>) tr_i.fetch(0),
-                        (Triad<Apfloat>) tr_i.fetch(1),
-                        (Triad<Apfloat>) tr_i.fetch(2),
-                        true
-                )
-        ).toList();
-
-        faces_tri = new Tetrad<>(tr.get(0), tr.get(1), tr.get(2), tr.get(3));
-        face_norms_tri = new Tetrad<>(trn.get(0), trn.get(1), trn.get(2), trn.get(3));
+        // ==== TRIANGULAR FACES VERTICES ====
+        Triad<Tuple<Apfloat>> tri0 = new Triad<>(vC0, vC1, vC2);
+        Triad<Apfloat> tri0_norm = VectorMath.normalTriple(vC0, vC1, vC2, true);
+        Triad<Tuple<Apfloat>> tri1 = new Triad<>(vC1, vC0, vC3);
+        Triad<Apfloat> tri1_norm = VectorMath.normalTriple(vC1, vC0, vC3, true);
+        Triad<Tuple<Apfloat>> tri2 = new Triad<>(vC2, vC3, vC0);
+        Triad<Apfloat> tri2_norm = VectorMath.normalTriple(vC2, vC3, vC0, true);
+        Triad<Tuple<Apfloat>> tri3 = new Triad<>(vC3, vC2, vC1);
+        Triad<Apfloat> tri3_norm = VectorMath.normalTriple(vC3, vC2, vC1, true);
+        faces_tri = new Tetrad<>(tri0,tri1,tri2,tri3);
+        face_norms_tri = new Tetrad<>(tri0_norm,tri1_norm,tri2_norm,tri3_norm);
     }
 
     @Override
     protected boolean inBounds(@NotNull Triad<Apfloat> point_cart) {
 
-        for (int i = 0; i < faces_tri.fetchSize(); i++) {
+        for (int i = 0; i < 4; i++) {
+            // Triangular  faces
             Triad<Tuple<Apfloat>> face = (Triad<Tuple<Apfloat>>) faces_tri.fetch(i);
-            Triad<Apfloat> v0 = (Triad<Apfloat>) face.fetch(0);
-            Triad<Apfloat> v1 = (Triad<Apfloat>) face.fetch(1);
-            Triad<Apfloat> v2 = (Triad<Apfloat>) face.fetch(2);
-
-            Triad<Apfloat> centroid = new Triad<>(
-                    v0.fetch(0).add(v1.fetch(0)).add(v2.fetch(0)).divide(THREE),
-                    v0.fetch(1).add(v1.fetch(1)).add(v2.fetch(1)).divide(THREE),
-                    v0.fetch(2).add(v1.fetch(2)).add(v2.fetch(2)).divide(THREE)
-            );
-            Triad<Apfloat> m = VectorMath.subs(point_cart, centroid);
+            Triad<Apfloat> vertA = (Triad<Apfloat>) face.fetch(0);
             Triad<Apfloat> norm = (Triad<Apfloat>) face_norms_tri.fetch(i);
+
+            // given point p and vertA, calculate vector from vertA -> p:
+            // m = p - vertA = (p_x - vertA_x, p_x - vertA_y, p_x -vertA_z)
+            Triad<Apfloat> m = VectorMath.subs(point_cart, vertA);
+
+            // compute dot product of m and face_norm:
+            // d = face_norm ⋅ m
+            //   = face_norm_x*m_x + face_norm_y*m_y + face_norm_z*m_z
+            //   = face_norm_x*(p_x-vertA_x)
+            //   + face_norm_y*(p_y-vertA_y)
+            //   + face_norm_z*(p_z-vertA_z)
             Apfloat d = VectorMath.dot_prod(norm, m);
-            if (d.compareTo(ZERO) > 0) return false;
+
+            // point outside if dot product > 0
+            if (d.compareTo(N0) > 0) {
+                return false;
+            }
         }
         return true;
     }
