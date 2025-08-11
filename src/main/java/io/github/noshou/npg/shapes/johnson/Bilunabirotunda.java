@@ -12,7 +12,7 @@ import static io.github.noshou.npg.nputil.VectorMath.*;
 /**
  * Represents a <b>Bilunabirotunda</b>
  * <p> A Johnson solid characterized by 14 vertices, 16 faces, and 30 edges.
- * <p>  The Bilunabirotunda is composed of a combination of polygons, including pentagons and
+ * <p> The Bilunabirotunda is composed of a combination of polygons, including pentagons and
  * triangles, arranged in a specific manner that forms this unique convex polyhedron.
  * It belongs to the family of Johnson solids, which are strictly convex polyhedra
  * with regular faces but are not uniform like Platonic or Archimedean solids.
