@@ -6,11 +6,12 @@ import io.github.noshou.tuple.*;
 import org.apfloat.Apfloat;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
+import io.github.noshou.npg.shapes.archimedean.*;
 
 /**
  * Represents a <b><i>levo</i>-Pentagonal Hexecontahedron</b>
- * <p>
- * The left-handed (<i>levo</i>) enantiomorph of the {@link HexecontahedronPentagonal}
+ * <p> It is the dual of the {@link DodecahedronSnubLevo}.
+ * <p> The left-handed (<i>levo</i>) enantiomorph of the {@link HexecontahedronPentagonal}
  * @see <a href="https://dmccooey.com/polyhedra/LpentagonalHexecontahedron.html">
  *      <i>levo</i>-Pentagonal Hexecontahedron (David McCooey)</a>
  */

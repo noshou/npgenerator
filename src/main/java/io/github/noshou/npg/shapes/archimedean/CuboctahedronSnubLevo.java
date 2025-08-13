@@ -13,7 +13,6 @@ import java.util.ArrayList;
  * The left-handed (<i>levo</i>) enantiomorph of the {@link CuboctahedronSnub}
  * @see <a href="https://dmccooey.com/polyhedra/LsnubCube.html">
  *      <i>levo</i>-Snub Cuboctahedron (David McCooey)</a>
- * 
  */
 public class CuboctahedronSnubLevo extends CuboctahedronSnub {
 

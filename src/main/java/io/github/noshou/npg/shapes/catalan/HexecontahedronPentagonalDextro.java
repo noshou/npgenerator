@@ -6,11 +6,12 @@ import io.github.noshou.tuple.*;
 import org.apfloat.Apfloat;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
+import io.github.noshou.npg.shapes.archimedean.*;
 
 /**
  * Represents a <b><i>dextro</i>-Pentagonal Hexecontahedron</b>
- * <p>
- * The right-handed (<i>dextro</i>) enantiomorph of the {@link HexecontahedronPentagonal}
+ * <p> The right-handed (<i>dextro</i>) enantiomorph of the {@link HexecontahedronPentagonal}.
+ * <p> It is the dual of the {@link DodecahedronSnubDextro}.
  * @see <a href="https://dmccooey.com/polyhedra/RpentagonalHexecontahedron.html">
  *      <i>dextro</i>-Pentagonal Hexecontahedron (David McCooey)</a>
  */

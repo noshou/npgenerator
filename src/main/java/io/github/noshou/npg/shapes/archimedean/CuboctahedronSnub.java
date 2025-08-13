@@ -12,14 +12,11 @@ import java.util.ArrayList;
 
 /**
  * Represents a <b>Snub Cuboctahedron (aka: Snub Cube)</b>
- * <p>
- * An Archimedean solid with 60 vertices, 92 faces
+ * <p> An Archimedean solid with 60 vertices, 92 faces
  * (comprised of 32 triangles and 6 squares), and 150 edges.
- * <p>
- * It is a chiral polyhedron, meaning it exists in two mirror-image forms:
- * the <i>levo</i> (left-handed) and <i>dextro</i> (right-handed) variants.
+ * <p> It is a chiral polyhedron, meaning it exists in two mirror-image forms:
+ * the {@link CuboctahedronSnubLevo} (left-handed) and {@link CuboctahedronSnubDextro} variants.
  * These enantiomorphs are not superimposable on each other.
- *
  */
 @SuppressWarnings("FieldCanBeLocal")
 public abstract class CuboctahedronSnub extends Shape {
@@ -27,11 +24,11 @@ public abstract class CuboctahedronSnub extends Shape {
     // children must fill in these faces!
 
     // 32 Equilateral triangles
-    private ArrayList<Triad<Tuple<Apfloat>>> faces_tri = new ArrayList<>();
+    private ArrayList<Triad<Tuple<Apfloat>>> faces_tri;
     private final ArrayList<Triad<Apfloat>> face_norms_tri= new ArrayList<>();
 
     // the 6 square faces
-    private ArrayList<Tetrad<Tuple<Apfloat>>> faces_sqr = new ArrayList<>();
+    private ArrayList<Tetrad<Tuple<Apfloat>>> faces_sqr;
     private final ArrayList<Triad<Apfloat>> face_norms_sqr = new ArrayList<>();
 
     // 24 vertices
@@ -69,7 +66,7 @@ public abstract class CuboctahedronSnub extends Shape {
     /**
      * C1 =sqrt(3 * (2 + cbrt(17 + 3*sqrt(33)) + cbrt(17 - 3*sqrt(33)))) / 6
      */
-    public Apfloat C1() {
+    protected Apfloat C1() {
         return ApfloatMath.sqrt(
                 N3.multiply(N2.add(ApfloatMath.cbrt(N17.add(N3mulSQRT33))))
                 .add(ApfloatMath.cbrt(N17.subtract(N3mulSQRT33)))
@@ -79,14 +76,14 @@ public abstract class CuboctahedronSnub extends Shape {
     /**
      * NEG_C1 = -(sqrt(3 * (2 + cbrt(17 + 3*sqrt(33)) + cbrt(17 - 3*sqrt(33)))) / 6)
      */
-    public Apfloat NEG_C1() {
+    protected Apfloat NEG_C1() {
         return C1().multiply(NEG_N1);
     }
 
     /*
      * C2 = sqrt(3 * (4 + cbrt(199 + 3*sqrt(33)) + cbrt(199 - 3*sqrt(33)))) / 6
      */
-    public Apfloat C2(){
+    protected Apfloat C2(){
         return ApfloatMath.sqrt(
                 N3.multiply(N4.add(ApfloatMath.cbrt(N199.add(N3mulSQRT33))))
                 .add(ApfloatMath.cbrt(N199.subtract(N3mulSQRT33)))
@@ -96,7 +93,7 @@ public abstract class CuboctahedronSnub extends Shape {
     /*
      * NEG_C2 = -(sqrt(3 * (4 + cbrt(199 + 3*sqrt(33)) + cbrt(199 - 3*sqrt(33)))) / 6)
      */
-    public Apfloat NEG_C2() {
+    protected Apfloat NEG_C2() {
         return C2().multiply(NEG_N1);
     }
 

@@ -80,7 +80,7 @@ public class SphereAu {
         long start_time_init = System.nanoTime();
 
         // Configuration parameters
-        String radius = "3.5"; // in nanometers
+        String radius = "10"; // in nanometers
         String units = "nm";
         LatticeType lattice_type = LatticeType.FCC;
         int precision = 500;

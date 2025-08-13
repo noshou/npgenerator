@@ -4,7 +4,7 @@ import io.github.noshou.npg.atom.Atom;
 import io.github.noshou.npg.lattice.LatticeType;
 import io.github.noshou.npg.nputil.FormatExecTime;
 import io.github.noshou.npg.shapes.*;
-import io.github.noshou.npg.shapes.archimedean.OctahedronTruncated;
+import io.github.noshou.npg.shapes.archimedean.OctahedronTruncatedCanonical;
 import io.github.noshou.tuple.*;
 import org.jetbrains.annotations.*;
 /**
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.*;
  * a face-centered cubic (FCC) lattice.
  * <p>
  * This class generates a default FCC atomic basis for gold and builds a
- * spherical nanoparticle using the {@link OctahedronTruncated} class,
+ * spherical nanoparticle using the {@link OctahedronTruncatedCanonical} class,
  * configured with user-defined radius, precision, and lattice parameters.
  */
 public class OctahedronTruncatedAu {
@@ -71,7 +71,7 @@ public class OctahedronTruncatedAu {
      * The main entry point for building and benchmarking a
      * gold FCC spherical nanoparticle.
      * <p>
-     * It creates a {@link OctahedronTruncated} using a specified radius and lattice constant,
+     * It creates a {@link OctahedronTruncatedCanonical} using a specified radius and lattice constant,
      * builds the structure, and prints the execution time in a human-readable format.
      * @param args the command-line arguments (not used)
      */
@@ -96,7 +96,7 @@ public class OctahedronTruncatedAu {
                 ) + "\n"
         );
         // Create and build the nanoparticle
-        Shape auTruncatedOctahedron = new OctahedronTruncated(
+        Shape auTruncatedOctahedron = new OctahedronTruncatedCanonical(
                 radius,
                 units,
                 lattice_type,

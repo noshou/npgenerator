@@ -3,6 +3,7 @@ package io.github.noshou.npg.shapes.catalan;
 import io.github.noshou.npg.atom.Atom;
 import io.github.noshou.npg.lattice.LatticeType;
 import io.github.noshou.npg.shapes.Shape;
+import io.github.noshou.npg.shapes.archimedean.*;
 import io.github.noshou.tuple.*;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
@@ -10,14 +11,13 @@ import org.jetbrains.annotations.NotNull;
 import static io.github.noshou.npg.nputil.VectorMath.*;
 import org.jetbrains.annotations.Contract;
 import java.util.ArrayList;
-
 /**
- * Represents a Pentagonal Hexecontahedron, a convex polyhedron composed of 60 pentagonal faces.
- * This Catalan solid is the dual of the truncated icosidodecahedron and exhibits icosahedral symmetry.
- * It has 92 vertices and 150 edges, with coordinates based on the golden ratio (phi) and a special
- * parameter x, calculated here with high-precision Apfloat arithmetic.
- * The shape can exist in two chiral forms: dextro (right-handed) and levo (left-handed), which are
- * mirror images of each other but not superimposable, similar to left and right hands.
+ * Represents a <b>Pentagonal Hexecontahedron</b>
+ * <p> A Catalan solid with 60 vertices, 92 faces
+ * (comprised of 60 pentagonal faces), and 150 edges.
+ * <p> It is a chiral polyhedron, meaning it exists in two mirror-image forms:
+ * the {@link HexecontahedronPentagonalLevo} (left-handed) and {@link HexecontahedronPentagonalDextro} variants.
+ * <p> It is the dual of the {@link DodecahedronSnub}.
  */
 @SuppressWarnings("FieldCanBeLocal")
 public abstract class HexecontahedronPentagonal extends Shape {

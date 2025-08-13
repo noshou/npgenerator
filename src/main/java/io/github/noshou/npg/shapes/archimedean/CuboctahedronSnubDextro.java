@@ -13,7 +13,6 @@ import java.util.ArrayList;
  * The right-handed (<i>dextro</i>) enantiomorph of the {@link CuboctahedronSnub}
  * @see <a href="https://dmccooey.com/polyhedra/LsnubCube.html">
  *      <i>dextro</i>-Snub Cuboctahedron (David McCooey)</a>
- * 
  */
 public class CuboctahedronSnubDextro extends CuboctahedronSnub {
 
