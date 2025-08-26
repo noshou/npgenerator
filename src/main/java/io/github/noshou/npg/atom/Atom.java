@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * coordinates and written into
  * mmCIF files or other crystallographic formats.
  * <p>
- * Additional fields like index and centroid are mutable and assist
+ * Additional fields like index and cartesian are mutable and assist
  * with serialization or spatial placement.
  * 
  */
@@ -39,11 +39,14 @@ public class Atom implements Comparable<Atom> {
     /** Precision (digits) used for all Apfloat computations */
     private final int precision;
 
-    /** Optional unique index for this atom in output (default: -1) */
+    /** Unique index for this atom in output (default: -1) */
     private int index = -1;
 
-    /** Optional cartesian coordinates of the atom (default: Nullad) */
-    private @NotNull Tuple<String> centroid = new Nullad<>();
+    /** Cartesian coordinates of the atom (default: Nullad) */
+    private @NotNull Tuple<String> cartesian = new Nullad<>();
+
+    /** Fractional coordinates of the atom (default: Nullad) */
+    private @NotNull Tuple<String> fractional = new Nullad<>();
 
     /**
      * Constructs an {@code Atom.Atom} with element name, radius, charge, fractional position.
@@ -95,27 +98,49 @@ public class Atom implements Comparable<Atom> {
     }
 
     /**
-     * Sets the Cartesian coordinates (centroid) of the atom.
+     * Sets the Cartesian coordinates of the atom.
      * <p>
-     * This method is <b>private</b> because the centroid should not be known at the time of
+     * This method is <b>private</b> because the cartesian should not be known at the time of
      * {@code Atom.Atom} construction—it is computed later when converting fractional positions
      * to Cartesian coordinates, typically by a lattice or grid-building class.
-     * @param centroid the converted (x, y, z) position in real space
+     * @param the converted (x, y, z) position in real space relative to the nanoparticle
      */
     @Contract(mutates = "this")
-    private void setCentroid(@NotNull Triad<String> centroid) {
-        this.centroid = centroid;
+    private void setCartesian(@NotNull Triad<String> cartesian) {
+        this.cartesian = cartesian;
     }
 
     /**
-     * Gets the Cartesian centroid of the atom, if set.
+     * Sets the fractional coordinates of the atom.
+     * <p>
+     * This method is <b>private</b> because the fractional coordinate should not be known at the time of
+     * {@code Atom.Atom} construction—it is computed later.
+     * @param the converted (x, y, z) position in fractional space relative to the crystal
+     */
+    @Contract(mutates = "this")
+    private void setFractional(@NotNull Triad<String> cartesian) {
+        this.cartesian = cartesian;
+    }
+
+
+    /**
+     * Gets the Cartesian coordinates of the atom, if set.
      * Default is a {@code Nullad} if unset.
-     *
      * @return a {@code Tuple<String>} of coordinates (may be empty/null-like)
      */
     @Contract(pure = true)
-    public @NotNull Tuple<String> getCentroid() {
-        return this.centroid;
+    public @NotNull Tuple<String> getCartesian() {
+        return this.cartesian;
+    }
+
+    /**
+     * Gets the fractional coordinates of the atom, if set.
+     * Default is a {@code Nullad} if unset.
+     * @return a {@code Tuple<String>} of coordinates (may be empty/null-like)
+     */
+    @Contract(pure = true)
+    public @NotNull Tuple<String> getFractional() {
+        return this.fractional;
     }
 
     /**
@@ -132,7 +157,7 @@ public class Atom implements Comparable<Atom> {
     }
 
     /**
-     * Returns the atomic volume computed from the radius (in nm³).
+     * Returns the atomic volume computed from the radius in Å³.
      * @return the volume as a string (Apfloat-compatible)
      */
     @Contract(pure = true)
@@ -253,23 +278,26 @@ public class Atom implements Comparable<Atom> {
     }
 
     /**
-     * Assigns lattice metadata to this atom: a unique index and Cartesian coordinates.
+     * Assigns lattice metadata to this atom: a unique index and fractional and cartesian coordinates.
      * <p>
      * <strong>Warning:</strong> This method directly mutates the calling object by updating its
      * index and real-space (Cartesian) position. It should be used with caution in contexts
      * where atomic identity is preserved but placement within the crystal or nanoparticle is staged.
-         * <p><strong>Typical usage pattern:</strong>
-         * <ol>
-         *   <li>Create a unit cell (defines element types and fractional positions)</li>
-         *   <li>Instantiate a lattice grid (defines spatial positions)</li>
-         *   <li>Use {@code latticePoint()} to assign index and coordinates</li>
-         * </ol>
-         * @param idx         the globally unique atom index (typically 1-based)
-     * @param coordinates the Cartesian coordinates of the atom on the lattice
+     * <p><strong>Typical usage pattern:</strong>
+     * <ol>
+     *   <li>Create a unit cell (defines element types and fractional positions)</li>
+     *   <li>Instantiate a lattice grid (defines spatial positions)</li>
+     *   <li>Use {@code latticePoint()} to assign index and coordinates</li>
+     * </ol>
+     * @param idx         the globally unique atom index (typically 1-based)
+     * @param cartesian  the Cartesian coordinates of the atom on the lattice
+     * @param fractional the fractional coordinates of the atom on the lattice (must be between 0 and 1)
      */
     @Contract(mutates = "this")
-    public void latticePoint(int idx, @NotNull Triad<String> coordinates) {
+    public void latticePoint(
+            int idx, @NotNull Triad<String> cartesian, @NotNull Triad<String> fractional) {
         this.setIndex(idx);
-        this.setCentroid(coordinates);
+        this.setCartesian(cartesian);
+        this.setFracCoords(fractional);
     }
 }

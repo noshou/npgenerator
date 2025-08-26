@@ -11,7 +11,7 @@ import io.github.noshou.npg.shapes.archimedean.*;
 /**
  * Represents a <b><i>dextro</i>-Pentagonal Hexecontahedron</b>
  * <p> The right-handed (<i>dextro</i>) enantiomorph of the {@link HexecontahedronPentagonal}.
- * <p> It is the dual of the {@link DodecahedronSnubDextro}.
+ * <p> It is the dual of the {@link DodecahedronSnubLevo}.
  * @see <a href="https://dmccooey.com/polyhedra/RpentagonalHexecontahedron.html">
  *      <i>dextro</i>-Pentagonal Hexecontahedron (David McCooey)</a>
  */

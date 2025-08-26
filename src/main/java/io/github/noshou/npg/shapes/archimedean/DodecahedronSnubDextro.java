@@ -11,7 +11,7 @@ import static io.github.noshou.npg.nputil.VectorMath.*;
 /**
  * Represents a <b><i>dextro</i>-Snub Dodecahedron</b>
  * <p> The right-handed (<i>dextro</i>) enantiomorph of the {@link DodecahedronSnub}.
- * <p> It is the dual of the {@link HexecontahedronPentagonalDextro}
+ * <p> It is the dual of the {@link HexecontahedronPentagonalLevo}
  * @see <a href="https://dmccooey.com/polyhedra/RsnubDodecahedron.html">
  *      <i>dextro</i>-Snub Dodecahedron (David McCooey)</a>
  */

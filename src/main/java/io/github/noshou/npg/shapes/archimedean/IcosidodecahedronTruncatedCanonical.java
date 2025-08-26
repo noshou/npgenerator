@@ -3,7 +3,7 @@
 
 import io.github.noshou.npg.atom.Atom;
 import io.github.noshou.npg.lattice.LatticeType;
-import io.github.noshou.npg.shapes.catalan.IcosahedronHexakisCanonical;
+import io.github.noshou.npg.shapes.catalan.TriacontahedronDisdyakisCanonical;
 import io.github.noshou.tuple.*;
 import org.apfloat.Apfloat;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>This polyhedron is formed by truncating (cutting off) the vertices of the
  * {@link Icosidodecahedron}. It consists of 62 faces: 30 squares, 20 hexagons,
  * and 12 decagons, with 180 edges and 120 vertices.
- * <p> It is the dual of the {@link IcosahedronHexakisCanonical}.
+ * <p> It is the dual of the {@link TriacontahedronDisdyakisCanonical}.
  * @see <a href="https://dmccooey.com/polyhedra/TruncatedIcosidodecahedron.html">
  *      Truncated Icosidodecahedron (David McCooey)</a>
  */

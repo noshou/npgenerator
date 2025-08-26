@@ -18,19 +18,19 @@ import io.github.noshou.npg.shapes.catalan.*;
  * {@link Octahedron}, it is a convex polyhedron with 14 faces: 8 regular hexagons
  * and 6 squares. It has 36 edges and 24 vertices, part of the Oh symmetry group.
  * <p> It can be circumscribed ({@link OctahedronTruncatedCanonical}) and
- * biscribed {@link OctahedronTruncatedBiscribed}
+ * biscribed ({@link OctahedronTruncatedBiscribed}).
  * <p> It is the dual of the {@link HexahedronTetrakis}
  */
 @SuppressWarnings("FieldCanBeLocal")
 public abstract class OctahedronTruncated extends Shape {
 
     // 6 square faces
-    private final Hexad<Tuple<Tuple<Apfloat>>> faces_sqr;
-    private final Hexad<Tuple<Apfloat>> face_norms_sqr;
+    private Hexad<Tuple<Tuple<Apfloat>>> faces_sqr;
+    private Hexad<Tuple<Apfloat>> face_norms_sqr;
 
     // 8 Hexagonal  faces
-    private final Octad<Tuple<Tuple<Apfloat>>> faces_hex;
-    private final Octad<Tuple<Apfloat>> face_norms_hex;
+    private Octad<Tuple<Tuple<Apfloat>>> faces_hex;
+    private Octad<Tuple<Apfloat>> face_norms_hex;
 
     // Apfloat constants
     protected final Apfloat NEG_N1 = new Apfloat("-1", super.precision);
@@ -101,30 +101,6 @@ public abstract class OctahedronTruncated extends Shape {
         verts.add(mult(normalize(vB22), super.getRadius().toString()));
         verts.add(mult(normalize(vB23), super.getRadius().toString()));
         this.vertices = verts;
-    }
-
-    public OctahedronTruncated(
-            @NotNull String radius,
-            @NotNull String radius_type,
-            @NotNull LatticeType lattice_type,
-            int precision,
-            @NotNull Polyad<Atom> basis,
-            @NotNull String lattice_constant,
-            @NotNull String file_name,
-            @NotNull String structure_name,
-            @NotNull String structure_index
-    ) {
-        super(
-                radius,
-                radius_type,
-                lattice_type,
-                precision,
-                basis,
-                lattice_constant,
-                file_name,
-                structure_name,
-                structure_index
-        );
 
         // ==== RECTANGULAR FACES ====
         Tetrad<Tuple<Apfloat>> sqr0 = new Tetrad<>(vertices.get(0), vertices.get(12), vertices.get(2), vertices.get(14));
@@ -161,6 +137,31 @@ public abstract class OctahedronTruncated extends Shape {
         Triad<Apfloat> hex7_norm = normalHex(vertices.get(2), vertices.get(18), vertices.get(7), vertices.get(23), vertices.get(11), vertices.get(21), true);
         faces_hex = new Octad<>(hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7);
         face_norms_hex = new Octad<>(hex0_norm, hex1_norm, hex2_norm, hex3_norm, hex4_norm, hex5_norm, hex6_norm, hex7_norm);
+
+    }
+
+    public OctahedronTruncated(
+            @NotNull String radius,
+            @NotNull String radius_type,
+            @NotNull LatticeType lattice_type,
+            int precision,
+            @NotNull Polyad<Atom> basis,
+            @NotNull String lattice_constant,
+            @NotNull String file_name,
+            @NotNull String structure_name,
+            @NotNull String structure_index
+    ) {
+        super(
+                radius,
+                radius_type,
+                lattice_type,
+                precision,
+                basis,
+                lattice_constant,
+                file_name,
+                structure_name,
+                structure_index
+        );
     }
 
     @Override

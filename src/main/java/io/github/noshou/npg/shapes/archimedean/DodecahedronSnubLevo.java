@@ -13,7 +13,7 @@ import static io.github.noshou.npg.nputil.VectorMath.*;
 /**
  * Represents a <b><i>levo</i>-Snub Dodecahedron</b>
  * <p> The right-handed (<i>levo</i>) enantiomorph of the {@link DodecahedronSnub}.
- * <p> It is the dual of the {@link HexecontahedronPentagonalLevo}.
+ * <p> It is the dual of the {@link HexecontahedronPentagonalDextro}.
  * @see <a href="https://dmccooey.com/polyhedra/LsnubDodecahedron.html">
  *      <i>levo</i>-Snub Dodecahedron (David McCooey)</a>
  */

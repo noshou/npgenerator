@@ -2,7 +2,7 @@ package io.github.noshou.npg.shapes.archimedean;
 import io.github.noshou.npg.atom.Atom;
 import io.github.noshou.npg.lattice.LatticeType;
 import io.github.noshou.npg.shapes.Shape;
-import io.github.noshou.npg.shapes.catalan.IcosahedronHexakis;
+import io.github.noshou.npg.shapes.catalan.TriacontahedronDisdyakis;
 import io.github.noshou.tuple.*;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
@@ -23,7 +23,7 @@ import static io.github.noshou.npg.nputil.VectorMath.*;
  *       all face centers—resulting in slightly different vertex positions and
  *       subtle shape variations.</li>
  * </ul>
- * <p> It is the dual of the {@link IcosahedronHexakis}.
+ * <p> It is the dual of the {@link TriacontahedronDisdyakis}.
  */
 public abstract class IcosidodecahedronTruncated extends Shape {
 

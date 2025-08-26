@@ -6,11 +6,12 @@ import io.github.noshou.tuple.*;
 import org.apfloat.Apfloat;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
+import io.github.noshou.npg.shapes.catalan.*;
 
 /**
  * Represents a <b><i>dextro</i>-Snub Cuboctahedron</b>
- * <p>
- * The right-handed (<i>dextro</i>) enantiomorph of the {@link CuboctahedronSnub}
+ * <p> The right-handed (<i>dextro</i>) enantiomorph of the {@link CuboctahedronSnub}.
+ * <p> It is the dual of the {@link IcositetrahedronPentagonalLevo} </p>
  * @see <a href="https://dmccooey.com/polyhedra/LsnubCube.html">
  *      <i>dextro</i>-Snub Cuboctahedron (David McCooey)</a>
  */

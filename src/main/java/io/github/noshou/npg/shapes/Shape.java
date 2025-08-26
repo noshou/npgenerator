@@ -55,10 +55,25 @@ public abstract class Shape {
      */
     protected final @NotNull Apfloat radius_angstroms;
 
+    /**
+     * "a" side length of unit cell
+     */
+    protected final @NotNull Apfloat a;
+
+
+    /**
+     * "b" side length of unit cell
+     */
+    protected final @NotNull Apfloat b;
+
+    /**
+     * "c" side length of unit cell
+     */
+    protected final @NotNull Apfloat c;
+
 
     /**
      * Constructs a new shape instance, resolving units and initializing the lattice.
-     *
      * @param radius           the radius of the atom as a string (interpreted using {@code radius_type}), non-null
      * @param radius_type      the unit of the radius (must be "pm", "A", "Å", or "nm"), non-null
      * @param lattice_type     the lattice type (currently only {@code Lattice.LatticeType.FCC} is supported), non-null
@@ -81,6 +96,8 @@ public abstract class Shape {
             @NotNull String structure_name,
             @NotNull String structure_index
     ) {
+
+        // convert radius to angstroms
         Apfloat TEN = new Apfloat("10", precision);
         Apfloat ONE_HUNDRED = new Apfloat("100", precision);
         Apfloat r = new Apfloat(radius, precision);
@@ -130,9 +147,17 @@ public abstract class Shape {
                     basis.fetch(3).getFormalChargeInt(),
                     basis.fetch(3).getRadius()
             );
+
+            // set side lengths (for fcc -> bind to circumsphere)
+            Apfloat N2 = new Apfloat("2", this.precision);
+            this.a = r.multiply(N2);
+            this.b = r.multiply(N2);
+            this.c = r.multiply(N2);
+
         } else {
             throw new IllegalArgumentException("Illegal lattice type!");
         }
+
     }
 
     /**
@@ -232,14 +257,10 @@ public abstract class Shape {
 
     /**
      * Builds the atomic structure and writes it to a CIF file.
-     * <p>
-     * Coordinates are iterated and filtered through {@code inBounds(Apfloat, Apfloat, Apfloat)}.
+     * <p> Coordinates are iterated and filtered through {@code inBounds(Apfloat, Apfloat, Apfloat)}.
      * Each valid coordinate is transformed into a lattice atom and recorded in the output file.
-     * 
-     *
      * <p><b>Contract:</b> This method must be called only once per instance. If writing fails at any point,
      * the temporary output is aborted.
-     *
      * @throws RuntimeException if an I/O error occurs during file writing or abortion
      */
     @Contract("-> fail")  // method may throw at runtime
@@ -247,9 +268,9 @@ public abstract class Shape {
 
         // get file instance, initialize shape
         // RADIUS IS IN NANOMETERS !!!
-        NpMmcifWriter file;
+        MmCifWriter file;
         try {
-            file = new NpMmcifWriter(this.file_name);
+            file = new MmCifWriter(this.file_name);
             file.init(this.getThis());
         }
         catch (IOException e) {
@@ -263,7 +284,11 @@ public abstract class Shape {
         // loop through coordinates, check if point is in bounds
         while (curr != null) {
 
-            // convert fractional co-ordinates to cartesian
+            // convert fractional coordinates to cartesian
+            // NOTE: this is "pseudo-fractional" meaning it is not
+            //       real fractional coordinates. this space is simply
+            //       used to simplify checking if a point is valid in the lattice
+            //       we must "convert" to real fractional lattice later on
             Apfloat x_frac = curr.fetch(0);
             Apfloat y_frac = curr.fetch(1);
             Apfloat z_frac = curr.fetch(2);
@@ -271,6 +296,8 @@ public abstract class Shape {
             Apfloat y_cart = y_frac.multiply(this.lattice_constant);
             Apfloat z_cart = z_frac.multiply(this.lattice_constant);
             Triad<Apfloat> point_cart = new Triad<>(x_cart, y_cart, z_cart);
+
+
 
             // check if point is in the unit lattice
             if (inBounds(point_cart)) {
@@ -282,15 +309,31 @@ public abstract class Shape {
                         y_frac,
                         z_frac
                 );
+
                 if (curr_atom != null) {
-                    curr_atom.latticePoint(
-                            (index+1),
-                            new Triad<>(
-                                    x_cart.toString(),
-                                    y_cart.toString(),
-                                    z_cart.toString()
-                            )
+
+                    // set index
+                    int idx = index + 1;
+
+                    // set cartesian coordinates
+                    Triad<String> cart = new Triad<>(
+                            x_cart.toString(),
+                            y_cart.toString(),
+                            z_cart.toString()
                     );
+
+                    // convert to "real" fractional coordinates
+                    // by dividing each fractional coordinate by
+                    // bounding box cell lengths
+                    Triad<String> frac = new Triad<>(
+                            x_cart.divide(this.a).toString(),
+                            y_cart.divide(this.b).toString(),
+                            z_cart.divide(this.c).toString()
+                    );
+
+                    // set data
+                    curr_atom.latticePoint(idx, cart, frac);
+
                     try {
                         file.addAtom(curr_atom);
                     } catch (IOException e2) {
@@ -323,13 +366,10 @@ public abstract class Shape {
 
     /**
      * Builds the atomic structure and writes it to a CIF file, with optional debug coordinate logging.
-     * <p>
-     * This variant behaves identically to {@link #build()} but also emits a debug trace of included and
+     * <p> This variant behaves identically to {@link #build()} but also emits a debug trace of included and
      * excluded atoms to a secondary file if {@code debug} is {@code true}.
-     *
      * <p><b>Contract:</b> This method must be called only once per instance. If writing or logging fails,
      * all temporary files are aborted.
-     *
      * @param debug whether to emit coordinate debug information to an auxiliary file
      * @throws RuntimeException if an I/O error occurs during writing, logging, or abortion
      */
@@ -350,9 +390,9 @@ public abstract class Shape {
 
         // get file instance, initialize shape
         // RADIUS IS IN NANOMETERS !!!
-        NpMmcifWriter file;
+        MmCifWriter file;
         try {
-            file = new NpMmcifWriter(this.file_name);
+            file = new MmCifWriter(this.file_name);
             file.init(this.getThis());
         }
         catch (IOException e) {
@@ -394,14 +434,28 @@ public abstract class Shape {
                 );
 
                 if (curr_atom != null) {
-                    curr_atom.latticePoint(
-                            index,
-                            new Triad<>(
-                                    x_cart.toString(),
-                                    y_cart.toString(),
-                                    z_cart.toString()
-                            )
+                    // set index
+                    int idx = index + 1;
+
+                    // set cartesian coordinates
+                    Triad<String> cart = new Triad<>(
+                            x_cart.toString(),
+                            y_cart.toString(),
+                            z_cart.toString()
                     );
+
+                    // convert to "real" fractional coordinates
+                    // by dividing each fractional coordinate by
+                    // bounding box cell lengths
+                    Triad<String> frac = new Triad<>(
+                            x_cart.divide(this.a).toString(),
+                            y_cart.divide(this.b).toString(),
+                            z_cart.divide(this.c).toString()
+                    );
+
+                    // set data
+                    curr_atom.latticePoint(idx, cart, frac);
+
                     index++;
                     try {
                         file.addAtom(curr_atom);

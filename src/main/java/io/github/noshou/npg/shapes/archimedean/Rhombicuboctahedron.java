@@ -28,7 +28,6 @@ public class Rhombicuboctahedron extends Shape {
     private final Octad<Tuple<Tuple<Apfloat>>> faces_tri;
     private final Octad<Tuple<Apfloat>> face_norms_tri;
 
-
     // Apfloat constants
     private final Apfloat NEG_N1 = new Apfloat("-1", super.precision);
     private final Apfloat N0 = new Apfloat("0", super.precision);
@@ -189,7 +188,6 @@ public class Rhombicuboctahedron extends Shape {
                 tri4_norm, tri5_norm, tri6_norm, tri7_norm
         );
     }
-
 
     protected boolean inBounds(@NotNull Triad<Apfloat> point_cart) {
         for (int i = 0; i < faces_sqr.fetchSize(); i++){

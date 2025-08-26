@@ -6,90 +6,76 @@ import io.github.noshou.tuple.*;
 import org.apfloat.Apfloat;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
+import io.github.noshou.npg.shapes.catalan.*;
 
 /**
  * Represents a <b><i>levo</i>-Snub Cuboctahedron</b>
- * <p>
- * The left-handed (<i>levo</i>) enantiomorph of the {@link CuboctahedronSnub}
- * @see <a href="https://dmccooey.com/polyhedra/LsnubCube.html">
- *      <i>levo</i>-Snub Cuboctahedron (David McCooey)</a>
+ * <p> The left-handed (<i>levo</i>) enantiomorph of the {@link CuboctahedronSnub}.
+ * <p> It is the dual of the {@link IcositetrahedronPentagonalLevo}. </p>
+ * <p> May be circumscribed ({@link CuboctahedronSnubLevoCanonical}) or
+ * circumscribed and inscribed ({@link CuboctahedronSnubLevoBiscribed}).
  */
-public class CuboctahedronSnubLevo extends CuboctahedronSnub {
+public abstract class CuboctahedronSnubLevo extends CuboctahedronSnub {
 
-    public CuboctahedronSnubLevo(
-            @NotNull String radius,
-            @NotNull String radius_type,
-            @NotNull LatticeType lattice_type,
-            int precision,
-            @NotNull Polyad<Atom> basis,
-            @NotNull String lattice_constant,
-            @NotNull String file_name,
-            @NotNull String structure_name,
-            @NotNull String structure_index
-    ) {
-        super(
-                radius,
-                radius_type,
-                lattice_type,
-                precision,
-                basis,
-                lattice_constant,
-                file_name,
-                structure_name,
-                structure_index
-        );
+    // list of vertices
+    private ArrayList<Triad<Apfloat>> vBase;
 
-        // ==== BASIS VERTICES ====
-        ArrayList<Triad<Apfloat>> vBase = new ArrayList<>();
-        Triad<Apfloat> vB0 = new Triad<>(C1(), C0(), C2());
+    // ==== BASIS VERTICES ====
+    // MUST be filled by children
+    protected Triad<Apfloat> vB0;
+    protected Triad<Apfloat> vB1;
+    protected Triad<Apfloat> vB2;
+    protected Triad<Apfloat> vB3;
+    protected Triad<Apfloat> vB4;
+    protected Triad<Apfloat> vB5;
+    protected Triad<Apfloat> vB6;
+    protected Triad<Apfloat> vB7;
+    protected Triad<Apfloat> vB8;
+    protected Triad<Apfloat> vB9;
+    protected Triad<Apfloat> vB10;
+    protected Triad<Apfloat> vB11;
+    protected Triad<Apfloat> vB12;
+    protected Triad<Apfloat> vB13;
+    protected Triad<Apfloat> vB14;
+    protected Triad<Apfloat> vB15;
+    protected Triad<Apfloat> vB16;
+    protected Triad<Apfloat> vB17;
+    protected Triad<Apfloat> vB18;
+    protected Triad<Apfloat> vB19;
+    protected Triad<Apfloat> vB20;
+    protected Triad<Apfloat> vB21;
+    protected Triad<Apfloat> vB22;
+    protected Triad<Apfloat> vB23;
+
+    /*
+     * Child classes must implement this method in their constructors
+     */
+    protected void setVerts() {
+
         vBase.add(vB0);
-        Triad<Apfloat> vB1 = new Triad<>(C1(), NEG_C0(), NEG_C2());
         vBase.add(vB1);
-        Triad<Apfloat> vB2 = new Triad<>(NEG_C1(), NEG_C0(), C2());
         vBase.add(vB2);
-        Triad<Apfloat> vB3 = new Triad<>(NEG_C1(), C0(), NEG_C2());
         vBase.add(vB3);
-        Triad<Apfloat> vB4 = new Triad<>(C2(), C1(), C0());
         vBase.add(vB4);
-        Triad<Apfloat> vB5 = new Triad<>(C2(), NEG_C1(), NEG_C0());
         vBase.add(vB5);
-        Triad<Apfloat> vB6 = new Triad<>(NEG_C2(), NEG_C1(), C0());
         vBase.add(vB6);
-        Triad<Apfloat> vB7 = new Triad<>(NEG_C2(), C1(), NEG_C0());
         vBase.add(vB7);
-        Triad<Apfloat> vB8 = new Triad<>(C0(), C2(), C1());
         vBase.add(vB8);
-        Triad<Apfloat> vB9 = new Triad<>(C0(), NEG_C2(), NEG_C1());
         vBase.add(vB9);
-        Triad<Apfloat> vB10 = new Triad<>(NEG_C0(), NEG_C2(), C1());
         vBase.add(vB10);
-        Triad<Apfloat> vB11 = new Triad<>(NEG_C0(), C2(), NEG_C1());
         vBase.add(vB11);
-        Triad<Apfloat> vB12 = new Triad<>(C0(), NEG_C1(), C2());
         vBase.add(vB12);
-        Triad<Apfloat> vB13 = new Triad<>(C0(), C1(), NEG_C2());
         vBase.add(vB13);
-        Triad<Apfloat> vB14 = new Triad<>(NEG_C0(), C1(), C2());
         vBase.add(vB14);
-        Triad<Apfloat> vB15 = new Triad<>(NEG_C0(), NEG_C1(), NEG_C2());
-        vBase.add(vB15);
-        Triad<Apfloat> vB16 = new Triad<>(C2(), NEG_C0(), C1());
         vBase.add(vB16);
-        Triad<Apfloat> vB17 = new Triad<>(C2(), C0(), NEG_C1());
         vBase.add(vB17);
-        Triad<Apfloat> vB18 = new Triad<>(NEG_C2(), C0(), C1());
         vBase.add(vB18);
-        Triad<Apfloat> vB19 = new Triad<>(NEG_C2(), NEG_C0(), NEG_C1());
         vBase.add(vB19);
-        Triad<Apfloat> vB20 = new Triad<>(C1(), NEG_C2(), C0());
         vBase.add(vB20);
-        Triad<Apfloat> vB21 = new Triad<>(C1(), C2(), NEG_C0());
         vBase.add(vB21);
-        Triad<Apfloat> vB22 = new Triad<>(NEG_C1(), C2(), C0());
         vBase.add(vB22);
-        Triad<Apfloat> vB23 = new Triad<>(NEG_C1(), NEG_C2(), NEG_C0());
         vBase.add(vB23);
-
+        
         // ==== SCALED VERTICES ====
         scaledVert(vBase);
 
@@ -138,5 +124,29 @@ public class CuboctahedronSnubLevo extends CuboctahedronSnub {
         sqr_faces.add(new Tetrad<>(vertices.get(8), vertices.get(21), vertices.get(11), vertices.get(22)));
         sqr_faces.add(new Tetrad<>(vertices.get(9), vertices.get(20), vertices.get(10), vertices.get(23)));
         sqrFaces(sqr_faces);
+
+    }
+    public CuboctahedronSnubLevo(
+            @NotNull String radius,
+            @NotNull String radius_type,
+            @NotNull LatticeType lattice_type,
+            int precision,
+            @NotNull Polyad<Atom> basis,
+            @NotNull String lattice_constant,
+            @NotNull String file_name,
+            @NotNull String structure_name,
+            @NotNull String structure_index
+    ) {
+        super(
+                radius,
+                radius_type,
+                lattice_type,
+                precision,
+                basis,
+                lattice_constant,
+                file_name,
+                structure_name,
+                structure_index
+        );
     }
 }

@@ -9,6 +9,8 @@ import org.apfloat.ApfloatMath;
 import org.jetbrains.annotations.*;
 import static io.github.noshou.npg.nputil.VectorMath.*;
 import java.util.ArrayList;
+import io.github.noshou.npg.shapes.catalan.*;
+
 
 /**
  * Represents a <b>Snub Cuboctahedron (aka: Snub Cube)</b>
@@ -16,7 +18,7 @@ import java.util.ArrayList;
  * (comprised of 32 triangles and 6 squares), and 150 edges.
  * <p> It is a chiral polyhedron, meaning it exists in two mirror-image forms:
  * the {@link CuboctahedronSnubLevo} (left-handed) and {@link CuboctahedronSnubDextro} variants.
- * These enantiomorphs are not superimposable on each other.
+ * It is the dual of the {@link IcositetrahedronPentagonal}.
  */
 @SuppressWarnings("FieldCanBeLocal")
 public abstract class CuboctahedronSnub extends Shape {
@@ -46,15 +48,19 @@ public abstract class CuboctahedronSnub extends Shape {
     private final Apfloat N199 = new Apfloat("199", super.precision);
     private final Apfloat N3mulSQRT33 = ApfloatMath.sqrt(N3.multiply(N33));
 
+    // sqrt(3 * (4 - cbrt(17 + 3*sqrt(33)) - cbrt(17 - 3*sqrt(33)))) / 6
+    private final Apfloat C0 =
+            ApfloatMath.sqrt(
+                    N3.multiply(
+                            N4.subtract(ApfloatMath.cbrt(N17.add(N3mulSQRT33)))
+                            ).subtract(
+                                    ApfloatMath.cbrt(N17.subtract(N3mulSQRT33)))
+            ).divide(N6);
+
     /**
-     * C0 = sqrt(3 * (4 - cbrt(17 + 3*sqrt(33)) - cbrt(17 - 3*sqrt(33)))) / 6
+     * @return sqrt(3 * (4 - cbrt(17 + 3*sqrt(33)) - cbrt(17 - 3*sqrt(33)))) / 6
      */
-    public Apfloat C0() {
-        return ApfloatMath.sqrt(
-                N3.multiply(N4.subtract(ApfloatMath.cbrt(N17.add(N3mulSQRT33))))
-                .subtract(ApfloatMath.cbrt(N17.subtract(N3mulSQRT33)))
-                ).divide(N6);
-    }
+    public Apfloat C0() {return C0; }
 
     /**
      * NEG_C0 = -(sqrt(3 * (4 - cbrt(17 + 3*sqrt(33)) - cbrt(17 - 3*sqrt(33)))) / 6)
@@ -63,35 +69,35 @@ public abstract class CuboctahedronSnub extends Shape {
         return C0().multiply(NEG_N1);
     }
 
+    // C1 = sqrt(3 * (2 + cbrt(17 + 3*sqrt(33)) + cbrt(17 - 3*sqrt(33)))) / 6
+    private final Apfloat C1 = ApfloatMath.sqrt(
+            N3.multiply(N2.add(ApfloatMath.cbrt(N17.add(N3mulSQRT33))))
+            .add(ApfloatMath.cbrt(N17.subtract(N3mulSQRT33)))
+            ).divide(N6);
     /**
-     * C1 =sqrt(3 * (2 + cbrt(17 + 3*sqrt(33)) + cbrt(17 - 3*sqrt(33)))) / 6
+     * @return sqrt(3 * (2 + cbrt(17 + 3*sqrt(33)) + cbrt(17 - 3*sqrt(33)))) / 6
      */
-    protected Apfloat C1() {
-        return ApfloatMath.sqrt(
-                N3.multiply(N2.add(ApfloatMath.cbrt(N17.add(N3mulSQRT33))))
-                .add(ApfloatMath.cbrt(N17.subtract(N3mulSQRT33)))
-                ).divide(N6);
-    }
-
+    protected Apfloat C1() {return C1;}
     /**
-     * NEG_C1 = -(sqrt(3 * (2 + cbrt(17 + 3*sqrt(33)) + cbrt(17 - 3*sqrt(33)))) / 6)
+     * @return = -(sqrt(3 * (2 + cbrt(17 + 3*sqrt(33)) + cbrt(17 - 3*sqrt(33)))) / 6)
      */
     protected Apfloat NEG_C1() {
         return C1().multiply(NEG_N1);
     }
 
+    // C2
+    private final Apfloat C2 = ApfloatMath.sqrt(
+            N3.multiply(N4.add(ApfloatMath.cbrt(N199.add(N3mulSQRT33))))
+                    .add(ApfloatMath.cbrt(N199.subtract(N3mulSQRT33)))
+    ).divide(N6);
     /*
-     * C2 = sqrt(3 * (4 + cbrt(199 + 3*sqrt(33)) + cbrt(199 - 3*sqrt(33)))) / 6
+     * @return sqrt(3 * (4 + cbrt(199 + 3*sqrt(33)) + cbrt(199 - 3*sqrt(33)))) / 6
      */
     protected Apfloat C2(){
-        return ApfloatMath.sqrt(
-                N3.multiply(N4.add(ApfloatMath.cbrt(N199.add(N3mulSQRT33))))
-                .add(ApfloatMath.cbrt(N199.subtract(N3mulSQRT33)))
-                ).divide(N6);
+        return C2;
     }
-
     /*
-     * NEG_C2 = -(sqrt(3 * (4 + cbrt(199 + 3*sqrt(33)) + cbrt(199 - 3*sqrt(33)))) / 6)
+     * @return -(sqrt(3 * (4 + cbrt(199 + 3*sqrt(33)) + cbrt(199 - 3*sqrt(33)))) / 6)
      */
     protected Apfloat NEG_C2() {
         return C2().multiply(NEG_N1);

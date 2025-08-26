@@ -10,7 +10,7 @@ import io.github.noshou.npg.shapes.archimedean.*;
 
 /**
  * Represents a <b><i>levo</i>-Pentagonal Hexecontahedron</b>
- * <p> It is the dual of the {@link DodecahedronSnubLevo}.
+ * <p> It is the dual of the {@link DodecahedronSnubDextro}.
  * <p> The left-handed (<i>levo</i>) enantiomorph of the {@link HexecontahedronPentagonal}
  * @see <a href="https://dmccooey.com/polyhedra/LpentagonalHexecontahedron.html">
  *      <i>levo</i>-Pentagonal Hexecontahedron (David McCooey)</a>
